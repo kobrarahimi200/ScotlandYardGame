@@ -1,0 +1,36 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package logic;
+
+import java.io.IOException;
+
+/**
+ *
+ * @author Reyhan
+ */
+
+public class Game {
+    private IO jsonFile;
+    private GUIConnector gui;
+    Game(IO jsonFile){
+        this.jsonFile = jsonFile;
+    }
+      /**
+     * load the game into the board. change the given file format to the sybmol
+     * and display them in the GU
+     *
+     */
+//    public Game load(Game game) {
+//
+//       
+//        jsonFile = new IO();
+//        try {
+//            game = jsonFile.loadFile(this.gui, game);
+//        } catch (IOException ex) {
+//        }
+//        return game;
+//    }
+}

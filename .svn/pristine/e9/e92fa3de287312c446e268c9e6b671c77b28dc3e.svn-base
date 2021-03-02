@@ -1,0 +1,108 @@
+package logic;
+
+import java.util.List;
+
+/**
+ *
+ * @author Reyhan
+ */
+public class SaveObj {
+
+    private boolean misterXAI;
+    private boolean detectiveAI;
+    private boolean isWon;
+    int CurrRoundNo;
+    int whosTurn;//current player id
+    int lastShownPos;//last shown position of mister x 
+    int[] possibleTargets;
+    int[] remainingTickets;
+    List<Integer> journeyBoard;//used ticket number 
+    int currPosOfMisterX;
+    int numOfDetectives;
+    int[] detectivesPos;
+    int[][] remainingTicketDetec;
+    Player[] players;
+
+    SaveObj(Player[] player, int idxPlayer, int numOfDetectives, boolean isWon) {
+       
+        //possibleTargets = player[0].
+        lastShownPos = player[0].lastShownPos();
+        remainingTickets = player[0].getAllTickets();
+        whosTurn = idxPlayer;
+        journeyBoard = player[0].getJournyList();
+        detectiveAI = player[1].isAI();
+        currPosOfMisterX = player[0].getCurrStation();
+        detectivesPos = new int[numOfDetectives + 1];
+        remainingTicketDetec =new int[numOfDetectives +1][];
+        players = player;
+        for (int i = 1; i < players.length; i++) {
+            detectivesPos[i] = players[i].getCurrStation();
+        }
+        for (int i = 1; i < players.length; i++) {
+            remainingTicketDetec[i] = players[i].getAllTickets();
+        }
+         misterXAI = players[0].isAI();
+        this.isWon = isWon;
+        for (int i = 0; i < player.length; i++) {
+            System.out.println("saveObj" + player[i] + " " + idxPlayer + " " + numOfDetectives + " " + isWon);
+            
+        }
+    }
+
+    public int getCurrPosOfMisterX() {
+        return currPosOfMisterX;
+    }
+
+    public Player[] getPlayers() {
+        return players;
+    }
+
+    public boolean isMisterXAI() {
+        return misterXAI;
+    }
+
+    public boolean isDetectiveAI() {
+        return detectiveAI;
+    }
+
+    public boolean getIsWon() {
+        return isWon;
+    }
+
+    public int getCurrRoundNo() {
+        return CurrRoundNo;
+    }
+
+    public int getWhosTurn() {
+        return this.whosTurn;
+    }
+
+    public int getLastShownPos() {
+        return lastShownPos;
+    }
+
+    public int[] getPossibleTargets() {
+        return possibleTargets;
+    }
+
+    public int[] getRemainingTickets() {
+        return remainingTickets;
+    }
+
+    public List<Integer> getJourneyBoard() {
+        return journeyBoard;
+    }
+
+    public int getNumOfDetectives() {
+        return numOfDetectives;
+    }
+
+    public int[] getDetectivesPos() {
+        return detectivesPos;
+    }
+
+    public int[][] getRemainingTicketDetec() {
+        return remainingTicketDetec;
+    }
+
+}

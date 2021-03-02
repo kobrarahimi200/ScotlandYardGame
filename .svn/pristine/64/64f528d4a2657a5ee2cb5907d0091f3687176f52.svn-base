@@ -1,0 +1,183 @@
+
+package logic;
+
+/**
+ *
+ * @author Reyhan
+ */
+public class Station {
+      private int identifier;
+    private Position pos;
+    //private List<int> ticket;
+
+    private int[] taxiTicket;//cab
+    private int[] busTicket;
+    private int[] trainTicket;//tube
+    private int[] boatTicket;
+
+    Station(int idenfier, Position pos, int[] train,int[] bus,int[] taxi,int[] boat) {
+        this.identifier = idenfier;
+        this.pos = pos;
+        this.trainTicket = train;
+        this.taxiTicket =taxi;
+        this.boatTicket = boat;
+        this.busTicket = bus; 
+    }
+
+    protected int getIdentifier() {
+        return this.identifier;
+    }
+   protected Position getPos() {
+        return this.pos;
+    }
+    public int[] getTaxiNeighbors() {
+        return this.taxiTicket;
+    }
+
+    protected  int[] getBusNeighbors() {
+        return this.busTicket;
+    }
+
+    protected  int[] getBoatNeighbors() {
+        return this.boatTicket;
+    }
+
+    protected  int[] getTrainNeighbors() {
+        return this.trainTicket;
+    }
+
+    boolean hasEnoughTicket(int station) {
+        boolean hasEnough = false;
+        if (this.getTrainNeighbors().length > 0) {
+            hasEnough = true;
+            //System.out.println("train T" + stations.get(station).getIdentifier());
+        } else if (this.getBusNeighbors().length > 0) {
+            hasEnough = true;
+           // System.out.println("Bus T" + stations.get(station).getIdentifier());
+        } else if (this.getTaxiNeighbors().length > 0) {
+            hasEnough = true;
+            //System.out.println("Taxi T" + stations.get(station).getIdentifier());
+        } else if (this.getBoatNeighbors().length > 0) {
+            hasEnough = true;
+            //System.out.println("Boat T" + stations.get(station).getIdentifier());
+        }
+        return hasEnough;
+    }
+
+    /**
+     * checks if current player in the given identifier(current station) has enough tickets.
+     *
+     * @param idx
+     * @param pl
+     * @return
+     */
+    boolean canPlay(int idx, Player pl) {
+        boolean isPlay = false;
+        isPlay = (this.getTaxiNeighbors().length > 0 && pl.getNumOfTaxis() > 0) || isPlay;
+        isPlay = (this.getBusNeighbors().length > 0 && pl.getNumOfBuses() > 0) || isPlay;
+        isPlay = (this.getTrainNeighbors().length > 0 && pl.getNumOfTrains() > 0) || isPlay;
+        isPlay = (this.getBoatNeighbors().length > 0 && pl.getNumOfBoats() > 0) || isPlay;
+        return isPlay;
+    }
+
+    /**
+     * checks if current player has enough ticket to go to the clicked station.
+     *
+     * @param clickedPosID
+     * @param currStation
+     * @param pl
+     * @return
+     */
+    boolean[] checkIfNeihbor(int clickedPosID, Player pl) {
+        //Position[] pos = null;
+        boolean[] neighbors = new boolean[4];
+        neighbors[0] = hasTrainNeighbor(clickedPosID) && pl.getNumOfTrains() > 0;
+        neighbors[1] = hasBusNeighbor(clickedPosID) && pl.getNumOfBuses() > 0;
+        neighbors[2] = hasTaxiNeighbor(clickedPosID) && pl.getNumOfTaxis() > 0;
+        neighbors[3] = hasBoatNeighbor(clickedPosID) && pl.getNumOfBoats() > 0;
+        return neighbors;
+    }
+
+    boolean isNeihbor(int identifier) {
+        boolean isNeihbor = false;
+        if (hasTrainNeighbor(identifier)) {
+            isNeihbor = true;
+        } else if (hasBoatNeighbor(identifier)) {
+            isNeihbor = true;
+        } else if (hasTaxiNeighbor(identifier)) {
+            isNeihbor = true;
+        } else if (hasBusNeighbor(identifier)) {
+            isNeihbor = true;
+        }
+        return isNeihbor;
+    }
+
+    /**
+     * checks if the current station has the bus neighbor, then return true
+     *
+     * @param clickedPosID
+     * @return
+     */
+    protected boolean hasBusNeighbor(int clickedPosID) {
+        boolean isNeighborBus = false;
+        for (int i = 0; i < this.getBusNeighbors().length && !isNeighborBus; i++) {
+            if (this.getBusNeighbors()[i] == clickedPosID) {
+                System.out.println("is the bus neighbor");
+                isNeighborBus = true;
+            }
+        }
+        return isNeighborBus;
+    }
+
+    /**
+     * checks if the current station has the bus neighbor, then return true
+     *
+     * @param clickedPosID
+     * @return
+     */
+    protected boolean hasTaxiNeighbor(int clickedPosID) {
+        boolean isNeighborTaxi = false;
+
+        for (int i = 0; i < this.getTaxiNeighbors().length && !isNeighborTaxi; i++) {
+            if (this.getTaxiNeighbors()[i] == clickedPosID) {
+                System.out.println("is the taxi neighbor");
+                isNeighborTaxi = true;
+            }
+        }
+        return isNeighborTaxi;
+    }
+
+    /**
+     * checks if the current station has the bus neighbor, then return true
+     *
+     * @param clickedPosID
+     * @return
+     */
+    protected boolean hasTrainNeighbor(int clickedPosID) {
+        boolean isNeighborTrain = false;
+        for (int i = 0; i < this.getTrainNeighbors().length && !isNeighborTrain; i++) {
+            if (this.getTrainNeighbors()[i] == clickedPosID) {
+                System.out.println("is the train neighbor");
+                isNeighborTrain = true;
+            }
+        }
+        return isNeighborTrain;
+    }
+
+    /**
+     * checks if the current station has the bus neighbor, then return true
+     *
+     * @param clickedPosID
+     * @return
+     */
+    protected boolean hasBoatNeighbor(int clickedPosID) {
+        boolean isNeighborBoat = false;
+        for (int i = 0; i < this.getBoatNeighbors().length && !isNeighborBoat; i++) {
+            if (this.getBoatNeighbors()[i] == clickedPosID) {
+                System.out.println("is the train neighbor");
+                isNeighborBoat = true;
+            }
+        }
+        return isNeighborBoat;
+    }
+}

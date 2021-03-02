@@ -1,0 +1,25 @@
+
+package logic;
+
+/**
+ *
+ * @author Reyhan
+ */
+public class Choose {
+
+    private Tickets t;
+    private Station s;
+    public Choose(Tickets ticket, Station s) {
+        this.t = ticket;
+        this.s =s;
+    }
+
+    public Tickets getTicket() {
+        return t;
+    }
+
+    public Station getStation() {
+        return s;
+    }
+    
+}

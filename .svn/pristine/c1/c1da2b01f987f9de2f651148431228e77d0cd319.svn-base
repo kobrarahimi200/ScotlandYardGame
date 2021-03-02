@@ -1,0 +1,17 @@
+
+package logic;
+
+/**
+ *
+ * @author Reyhan
+ */
+public class SaveObj {
+
+    boolean misterXAI;
+    boolean detectiveAI;
+    
+    SaveObj(Player player, int idxPlayer, int numOfDetectives, boolean isWon) {
+        
+    }
+    
+}

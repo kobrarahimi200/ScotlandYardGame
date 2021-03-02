@@ -1,0 +1,64 @@
+package logic;
+
+/**
+ *
+ * @author ite102770
+ */
+public class Stations {
+    private int identifier;
+    private Position position;
+    private int[] tube;//cab
+    private int[] bus;
+    private int[] cab;//train
+    private int[] boat;
+
+    public int getIdentifier() {
+        return identifier;
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    public int[] getCab() {
+        return cab;
+    }
+
+    public int[] getBus() {
+        return bus;
+    }
+
+    public void setIdentifier(int identifier) {
+        this.identifier = identifier;
+    }
+
+    public void setPosition(Position position) {
+        this.position = position;
+    }
+
+    public void setTube(int[] tube) {
+        this.tube = tube;
+    }
+
+    public void setBus(int[] bus) {
+        this.bus = bus;
+    }
+
+    public void setCab(int[] cab) {
+        this.cab = cab;
+    }
+
+    public void setBoat(int[] boat) {
+        this.boat = boat;
+    }
+
+    public int[] getTube() {
+        return tube;
+    }
+
+    public int[] getBoat() {
+        return boat;
+    }
+
+
+}

@@ -1,0 +1,42 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package logic;
+
+import org.json.JSONException;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+/**
+ *
+ * @author Reyhan
+ */
+public class GameTest {
+    private final FakeGUI FakeGUI = new FakeGUI();
+    public GameTest() {
+    }
+
+    @Test
+    public void testGetRandom() throws JSONException {
+        Game game = new Game(1,3,true,false,FakeGUI);
+        //game.startingPoints();
+        int x =game.selectRandom(game.startingPoints());
+        System.out.println("random number is : " +x);
+    }
+     @Test
+    public void testGetCurrStation() throws JSONException {
+        Game game = new Game(1,7,true,false,FakeGUI);
+        //game.startingPoints();
+        game.assignStartingPoint();
+    }
+     @Test
+    public void testGetNumOfTicketsType() throws JSONException {
+        Game game = new Game(1,7,true,false,FakeGUI);
+       // game.startingPoints();
+       game.assignStartingPoint();
+       assertTrue(game.hasEnoughTicket());
+        
+    }
+}

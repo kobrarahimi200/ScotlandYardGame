@@ -1,0 +1,233 @@
+package logic;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.List;
+import java.util.Scanner;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public class IO {
+
+    String inPath = "C:\\Users\\Reyhan\\Desktop\\map.json";
+    FileOutputStream f = null;
+    FileChooser fileChooser = null;
+    OutputStreamWriter o = null;
+    Object saveObj;
+    GUIConnector gui;
+    Game game;
+    SaveObj saveobject;
+    SaveObj loadObject;
+
+    public JSONArray getJsonValues() throws JSONException {
+        Gson gson = new Gson();
+        JSONArray jarray = null;
+        try (FileReader reader = new FileReader("net.json")) {
+            Object obj;
+            obj = gson.fromJson(reader, Object.class);
+            JSONObject jo2 = new JSONObject(obj.toString());
+            //jarray = jo2.getJSONObject(obj.toString()).getJSONArray("stations");
+            jarray = jo2.getJSONArray("stations");
+            for (int i = 0; i < jarray.length(); i++) {
+                JSONObject pos = jarray.getJSONObject(i);
+            }
+
+        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
+        }
+        return jarray;
+    }
+
+    public static boolean isJSONValid(String test) {
+        try {
+            JSONObject jsonObject = new JSONObject(test);
+        } catch (JSONException ex) {
+            // edited, to include @Arthur's comment
+            // e.g. in case JSONArray is valid as well...
+            try {
+                JSONArray jsonArray = new JSONArray(test);
+            } catch (JSONException ex1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void saveField(SaveObj saveObject)
+            throws IOException, JSONException {
+        this.saveobject = saveObject;
+        FileChooser chooser = new FileChooser();
+        chooser.setInitialDirectory(new File(System.getProperty("user.dir")));
+        chooser.setTitle("Choose location To Save Report");
+        File selectedFile = null;
+        if (selectedFile == null) {
+            chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter(".json", ".json"),
+                    new ExtensionFilter(".txt", ".txt"));
+            selectedFile = chooser.showSaveDialog(null);
+        }
+        if (selectedFile != null) {
+            saveObj = setSave();
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+            try (FileWriter writer = new FileWriter(selectedFile.getPath())) {
+                gson.toJson(setSave(), writer);
+                //JSON.write(writer, data);
+                //  writer.endObject();
+                writer.flush();
+            } catch (IOException e) {
+            }
+        }
+    }
+
+    /**
+     * create json object for each type of player with the given parameters,
+     * idxPalyer is the id of the current player, p is the array of players and
+     * lastShonPos is the last shown position of mister x.
+     *
+     * @param p
+     * @param idxPlayer
+     * @param lastShowPos
+     * @return
+     * @throws JSONException
+     */
+    private Object setSave() throws JSONException {
+        int[] possibleTargets = new int[0];
+        int[] remainingTikets = saveobject.getRemainingTickets();
+        List<Integer> journeyBoard = saveobject.getJourneyBoard();
+        JsonArray players;
+        JsonObject MisterX = new JsonObject(); //add new json object
+        JsonObject detectives = new JsonObject();
+        //mister x
+        MisterX.addProperty("ai", saveobject.isMisterXAI());//mister x is AI or not
+        MisterX.add("possibleTargets", new Gson().toJsonTree(possibleTargets));//add json lement to object
+        MisterX.addProperty("lastShownPos", saveobject.lastShownPos);
+        MisterX.addProperty("currPos", saveobject.getCurrPosOfMisterX());//add value to json object
+        MisterX.add("remainingTikets", new Gson().toJsonTree(remainingTikets));
+        MisterX.add("journeyBoard", new Gson().toJsonTree(journeyBoard));
+        //detectives
+        players = new JsonArray();
+        for (int i = 1; i < saveobject.getPlayers().length; i++) {
+            JsonObject playersChilds = new JsonObject();
+            playersChilds.addProperty("position", saveobject.getPlayers()[i].getCurrStation());
+            playersChilds.add("remainingTickets", new Gson().toJsonTree(saveobject.getPlayers()[i].getAllTickets()));
+            //players.set(i, playersChilds);
+            players.add(playersChilds);
+        }
+        detectives.addProperty("noOfDetectives", saveobject.getPlayers().length - 1);
+        detectives.addProperty("ai", saveobject.isDetectiveAI());
+        detectives.add("players", new Gson().toJsonTree(players));
+
+        //players.add(new Gson().toJsonTree(MisterX));
+        JsonObject mainObj = new JsonObject();
+        mainObj.add("misterX", new Gson().toJsonTree(MisterX));
+        mainObj.add("detectives", new Gson().toJsonTree(detectives));
+        mainObj.addProperty("whoseTurn", saveobject.getWhosTurn());
+        mainObj.addProperty("currRoundNo", 2);
+        mainObj.addProperty("gameIsWon", false);
+        MisterX = mainObj;
+        return MisterX;
+    }
+
+    /**
+     * read the file and convert each line of file to symbol/
+     *
+     * @param gui
+     * @param game
+     * @return
+     * @throws IOException
+     * @throws org.json.JSONException
+     */
+    public Game loadFile(GUIConnector gui, Game game) throws IOException, JSONException {
+        this.gui = gui;
+        this.game = game;
+        String line = "";
+        String fileString = "";
+        FileReader fr = null;
+        BufferedReader br = null;
+        InputStreamReader sr = null;
+        Scanner sc = null;
+        FileChooser chooser = new FileChooser();
+        chooser.setInitialDirectory(new File(System.getProperty("user.dir")));
+        chooser.setTitle("Choose your load file");
+        File selectedFile = null;
+        if (selectedFile == null) {
+            selectedFile = chooser.showOpenDialog(null);
+        }
+        try {
+            if (selectedFile != null) {
+                fr = new FileReader(selectedFile.getPath());
+                sr = new InputStreamReader(System.in);
+                // work
+                br = new BufferedReader(fr);
+                sc = new Scanner(sr);
+                while ((line = br.readLine()) != null) {
+                    fileString = fileString + line + "\n";
+                }
+            }
+        } finally {
+            // close
+            if (sc != null) {
+                sc.close();
+            }
+            if (br != null) {
+                br.close();
+            }
+            if (sr != null) {
+                sr.close();
+            }
+            if (fr != null) {
+                fr.close();
+            }
+        }
+        return selectedFile != null ? loadAllFileString(fileString) : this.game;
+    }
+
+    /**
+     * convert the given string to board by splitting each line.
+     *
+     * @param fileString is the given file to convert
+     * @return a new game with all elements inside the converted board
+     */
+    private Game loadAllFileString(String fileString) throws JSONException {
+        //System.out.println("load file " + fileString);
+
+        JSONObject json = new JSONObject(fileString);
+        System.out.println("load object" + json.get("misterX"));
+        int idxPlayer = json.getInt("whoseTurn");
+        JSONObject detectives = (JSONObject) json.get("detectives");
+        int noOfDetectives = detectives.getInt("noOfDetectives");
+        Player[] p = new Player[noOfDetectives];//detectives players
+        JSONObject[] detecPlayers = new JSONObject[noOfDetectives];
+        for (int i = 0; i < p.length; i++) {
+            detecPlayers[i] = detectives.getJSONArray("players").getJSONObject(i);
+        }
+        for (int i = 0; i < p.length; i++) {
+              System.out.println("loading  " + detecPlayers[i]);   
+        }
+        //int[] detecPositions = detecPlayers
+        int errorFormat = 0;
+        Board temp = new Board();
+        if (temp != null) {
+            this.game = new Game(temp, gui, p, idxPlayer, noOfDetectives);
+        } else {
+            errorFormat = 1;
+            gui.showMsg(errorFormat);
+        }
+
+        return this.game;
+    }
+}

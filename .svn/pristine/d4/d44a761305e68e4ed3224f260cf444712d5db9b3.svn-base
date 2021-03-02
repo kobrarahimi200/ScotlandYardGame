@@ -1,0 +1,25 @@
+{
+  "misterX": {
+    "ai": true,
+    "possibleTargets": [],
+    "lastShownPos": 0,
+    "currPos": 128,
+    "remainingTikets": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "journeyBoard": [
+      0,
+      0
+    ]
+  },
+  "detectives": {
+    "ai": true,
+    "players": []
+  },
+  "whoseTurn": 1,
+  "currRoundNo": 2,
+  "gameIsWon": false
+}

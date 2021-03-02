@@ -1,0 +1,332 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package logic;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import org.json.JSONException;
+
+/**
+ *
+ * @author Reyhan
+ */
+public class Game {
+
+    private GUIConnector gui;
+    private Board board;
+    private int numOfDetectives = 0;
+    private int numOfMisterX = 1;
+    private boolean misterXIsAI = false;
+    private boolean detectiveIsAI = false;
+    private double coordX;
+    private double coordY;
+    Position clickedPos;
+    private int idxCurrPlayer;
+    private List<Integer> staringPoints = new ArrayList<>();
+    private Player[] players;
+    private Position currPosition;
+    int x = 0;
+
+    public Game(int numOfMixterX, int numOfDetectives, boolean misterXIsAI,
+            boolean detectiveIsAI, GUIConnector gui) throws JSONException {
+        this.numOfDetectives = numOfDetectives;
+        this.numOfMisterX = numOfMixterX;
+        this.misterXIsAI = misterXIsAI;
+        this.detectiveIsAI = detectiveIsAI;
+        this.staringPoints = startingPoints();
+        this.currPosition = null;
+        this.gui = gui;
+        assert (gui != null);
+        int plyerId = 0;
+        this.players = new Player[numOfMixterX + numOfDetectives];
+        this.idxCurrPlayer = 0;
+        this.board = new Board();
+        for (int i = 0; i < numOfMixterX; i++) {
+            players[i] = new MisterX(i, playerType.MISTERX, misterXIsAI, 4, 3, 4, numOfDetectives);
+            plyerId = i;
+        }
+        for (int k = plyerId + 1; k < numOfDetectives + numOfMixterX; k++) {
+            players[k] = new Detectives(k, playerType.values()[k], detectiveIsAI, 4, 4, 4, 0);
+        }
+        // System.out.println("game logic" + numOfMixterX + " det " + numOfDetectives);
+        for (int i = 0; i < players.length; i++) {
+            System.out.println("playrs " + players[i].toString());
+        }
+        assignStartingPoint();
+        this.gui.updateLabelTicketsNum(players[idxCurrPlayer].getAllTickets());
+
+    }
+
+    public void setCoordinates(double x, double y, double paneWidth, double paneHeight) {
+        System.out.println("clicked: " + x +", " + y);
+        this.coordX = x;
+        this.coordY = y;
+        double convertedX = x / paneWidth;
+        double convertedY = y / paneHeight;
+        this.clickedPos = new Position(convertedX, convertedY);
+    }
+
+    public Position getClickedPos() {
+        return this.clickedPos;
+    }
+
+    /**
+     *
+     * @param game
+     * @throws JSONException
+     * @throws InterruptedException
+     */
+    public void displayPlayer(Game game) throws JSONException, InterruptedException {
+        Position pos = calClosestPosition(clickedPos);
+        int id = board.getIdentifier(pos);// clicked position
+        boolean[] neibors;
+        if (board.isNeihbor(id, players[idxCurrPlayer].getCurrStation())) {
+            this.currPosition = pos;
+            neibors = board.checkIfNeihbor(id, players[idxCurrPlayer].getCurrStation(), players[idxCurrPlayer]);
+            // if (canPlay(neibors)) {
+            if (countTrueValues(neibors) > 1) { // count the number of avaliable tickets
+                System.out.println("true values has more than one");
+                this.gui.showInDropDownList(game, neibors, pos);
+            } else if (countTrueValues(neibors) == 1) {
+                changeRound(getStationFromArray(neibors));
+            } else {
+                System.out.println("true values is less than one" + countTrueValues(neibors));
+                //nextPlayer();
+            }
+            //       }
+        }
+    }
+
+    /**
+     * checks if the current player has enough ticket to his niehbors.
+     *
+     * @return
+     */
+    private boolean canPlay(int idx, Player pl) {
+        boolean isPlay = false;
+        isPlay = board.canPlay(idx, pl);
+        System.out.println("isplay  " + isPlay + "cur sation" + idx);
+        return isPlay;
+    }
+
+    /**
+     * decrease the used ticket and change the round.
+     *
+     * @param ticket
+     * @throws JSONException
+     */
+    public void changeRound(String ticket) throws JSONException {
+        if (players[idxCurrPlayer].getPlayerType() == playerType.MISTERX) {
+            this.gui.showMisterXTicket(ticket);
+        }
+        x = 0;
+        decreaseUsedTicket(ticket);
+        players[idxCurrPlayer].setCurrStation(board.getIdentifier(currPosition));
+        this.gui.displaySymbol(currPosition, idxCurrPlayer, false);
+        System.out.println("change round");
+        nextPlayer();
+    }
+
+    /**
+     * next player is called
+     *
+     * @throws JSONException
+     */
+    void nextPlayer() throws JSONException {
+        checkWinner();
+        if (players[idxCurrPlayer].getPlayerType() == playerType.MISTERX) {
+            players[idxCurrPlayer].incNumOfTurns();
+            System.out.println("** turns  " + players[idxCurrPlayer].getnumOfTurns());
+        }
+        this.idxCurrPlayer = (this.idxCurrPlayer + 1) % players.length;//next player
+        if (!canPlay(players[idxCurrPlayer].getCurrStation(), players[idxCurrPlayer])) {
+            System.out.println("can not play");
+            x++;
+            if (x == players.length) {
+                System.out.println("ending the game , all playrs cannot play");
+                endGame();
+            } else {
+                nextPlayer();
+            }
+        }
+        this.gui.showCurrentPlayer(idxCurrPlayer);
+        this.gui.updateLabelTicketsNum(players[idxCurrPlayer].getAllTickets());
+        this.currPosition = board.getCoordinate(players[idxCurrPlayer].getCurrStation());
+    }
+
+    private void checkWinner() {
+        //check if current station of every detective is equal to mister x
+        //check if misterx use 24 tickets and also detectives 
+        if (players[idxCurrPlayer].getPlayerType() != playerType.MISTERX
+                && players[0].getCurrStation() == players[idxCurrPlayer].getCurrStation()) {
+            System.out.println("detective catches the misterX");
+            endGame();
+        }
+        if (players[idxCurrPlayer].getPlayerType() == playerType.MISTERX
+                && players[idxCurrPlayer].getNumOfTrains() == 24) {
+            System.out.println("mister x player all 24 turns");
+            endGame();
+        }
+    }
+
+    /**
+     *
+     * @return
+     */
+    boolean hasEnoughTicket() {
+        boolean isValid = false;
+        for (int i = 0; i < players[idxCurrPlayer].getAllTickets().length; i++) {
+            if (players[idxCurrPlayer].getAllTickets()[i] > 0) {
+                isValid = true;
+            }
+        }
+        return isValid;
+    }
+
+    /**
+     * when just one ticket type is avalaibe, this method is caled to return the
+     * ticket type
+     *
+     * @param arr
+     * @return
+     */
+    private String getStationFromArray(boolean[] arr) {
+        String temp = "";
+        for (int i = 0; i < arr.length; i++) {
+            if (arr[i]) {
+                temp = Tickets.values()[i].toString();
+            }
+        }
+        return temp;
+    }
+
+    /**
+     * counts the number of true values of the given array
+     *
+     * @param tickets
+     * @return
+     */
+    private int countTrueValues(boolean[] tickets) {
+        int x = 0;
+        for (int i = 0; i < tickets.length; i++) {
+            if (tickets[i]) {
+                x++;
+            }
+        }
+        return x;
+    }
+
+    /**
+     * decrease the given ticket
+     *
+     * @param ticket
+     */
+    public void decreaseUsedTicket(String ticket) {
+        System.out.println("curr Ticket " + ticket);
+        switch (ticket) {
+            case "BUS":
+                players[idxCurrPlayer].decTicket(Tickets.BUS);
+                break;
+            case "TAXI":
+                players[idxCurrPlayer].decTicket(Tickets.TAXI);
+                break;
+            case "BOAT":
+                players[idxCurrPlayer].decTicket(Tickets.BOAT);
+                break;
+            case "TRAIN":
+                players[idxCurrPlayer].decTicket(Tickets.TRAIN);
+                break;
+            default:
+                break;
+        }
+        System.out.println("log tick " + ticket);
+    }
+
+    /**
+     * calculate pos if this pos is the clicked in right coordinate
+     *
+     * @param pos
+     * @return
+     * @throws JSONException
+     */
+    Position calClosestPosition(Position pos) throws JSONException {
+        assert (pos != null);
+        return this.board.calcValidSation(pos);
+    }
+
+    List<Integer> startingPoints() {
+        // 13, 26, 29, 34, 50, 53, 91, 94, 103,112, 117, 132, 138, 141, 155, 174, 197, 198
+        this.staringPoints.add(13);
+        this.staringPoints.add(26);
+        this.staringPoints.add(29);
+        this.staringPoints.add(34);
+        this.staringPoints.add(50);
+        this.staringPoints.add(53);
+        this.staringPoints.add(91);
+        this.staringPoints.add(94);
+        this.staringPoints.add(103);
+        this.staringPoints.add(112);
+        this.staringPoints.add(117);
+        this.staringPoints.add(132);
+        this.staringPoints.add(138);
+        this.staringPoints.add(141);
+        this.staringPoints.add(155);
+        this.staringPoints.add(174);
+        this.staringPoints.add(197);
+        this.staringPoints.add(198);
+        //System.out.println("list " + this.staringPoints);
+        return staringPoints;
+    }
+
+    int selectRandom(List<Integer> array) {
+        int rnd = new Random().nextInt(array.size());
+        return array.get(rnd);
+    }
+
+    /**
+     * gets random number from starting point list and assign it to every player
+     * starting station number.
+     *
+     * @throws org.json.JSONException
+     */
+    public void assignStartingPoint() throws JSONException {
+        int temp = 0;
+        int rnd;
+        List<Integer> tempArray = new ArrayList<>();
+        tempArray.addAll(this.staringPoints);
+        //int[] tempArray = new int[players.length];
+        // System.out.println("tempArray " + tempArray);
+        for (int i = 0; i < players.length; i++) {
+            rnd = new Random().nextInt(tempArray.size());
+            temp = tempArray.get(rnd);//selected random station
+            players[i].setCurrStation(temp);
+            System.out.println("temp " + temp + " ** " + players[i].getCurrStation());
+            // if (players[i].getCurrStation() == 0) {
+
+            this.gui.displaySymbol(board.getCoordinate(players[i].getCurrStation() - 1), i, true);
+            tempArray.remove(rnd);
+        }
+        showCurrPlayer();
+    }
+
+    public void showCurrPlayer() {
+        this.gui.showCurrentPlayer(idxCurrPlayer);
+    }
+
+    public void clear() {
+        this.gui.clear();
+    }
+
+    public void startGame() {
+        //this.gui.displaySymbol(, idxCurrPlayer, numOfMisterX, numOfMisterX);
+    }
+
+    public void endGame() {
+        System.out.println("END");
+        this.gui.gameWon(players[idxCurrPlayer].getPlayerType().toString(), idxCurrPlayer);
+    }
+}

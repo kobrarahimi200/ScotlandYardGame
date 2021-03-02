@@ -1,0 +1,28 @@
+{
+  "misterX": {
+    "ai": true,
+    "possibleTargets": [],
+    "currPos": 128,
+    "remainingTikets": [
+      0,
+      0,
+      0,
+      0
+    ],
+    "journeyBoard": [
+      0,
+      0
+    ]
+  },
+  "detectives": {
+    "id": 1,
+    "type": "BLACK",
+    "isAI": true,
+    "boats": 3,
+    "taxis": 3,
+    "buses": 3,
+    "trains": 4,
+    "station": 0
+  },
+  "currPos": 128
+}

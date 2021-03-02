@@ -1,0 +1,84 @@
+package logic;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+
+/**
+ * this is logging the file
+ *
+ * @author Kobra
+ */
+public class Log {
+
+    FileOutputStream f;
+    OutputStreamWriter o;
+    String toprint = "";
+    String startValues = "";
+    Player[] players;
+    String endGame = "";
+    
+
+    public Log(String s) {
+        try {
+            this.f = new FileOutputStream(s);
+            this.o = new OutputStreamWriter(this.f);
+        } catch (IOException ex) {
+
+        }
+    }
+
+    public void setDefaultsLogValues(Player[] players) throws IOException {
+        this.players = players;
+        startValues += players.length - 1 + ", " + players[0].isAI() + ", " + players[1].isAI() + "";
+        for (int i = 0; i < players.length; i++) {
+            startValues += ", " + players[i].getPrevStation();
+        }
+         startValues+= "\n" ;
+        System.out.println(startValues);
+        o.append(startValues);
+
+    }
+
+    /**
+     * logging all given parameters
+     *
+     *
+     * @param players
+     * @param idxCurrPlayer
+     */
+    public void logging(Player[] players, int idxCurrPlayer) {
+        try {
+            toprint =  idxCurrPlayer + ", "
+                    + players[idxCurrPlayer].getPrevStation() + ", "
+                    + players[idxCurrPlayer].getCurrStation() + ", "
+                    + players[idxCurrPlayer].getNumOfTrains() + ", "
+                    + players[idxCurrPlayer].getNumOfBuses() + ", "
+                    + players[idxCurrPlayer].getNumOfTaxis() + ", "
+                    + players[idxCurrPlayer].getNumOfBoats() + ", "
+                    + players[idxCurrPlayer].getaiID()+ "\n";
+
+            System.out.println(toprint);
+            o.append(toprint);
+            o.flush();
+        } catch (IOException ex) {
+
+        }
+    }
+
+    /**
+     * closing the log file
+     */
+    public void closeLog() throws IOException {
+        try {
+            if (f != null) {
+                f.close();
+            }
+            if (o != null) {
+                o.close();
+            }
+        } catch (IOException ex) {
+
+        }
+    }
+}

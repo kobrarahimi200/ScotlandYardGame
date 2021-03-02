@@ -1,0 +1,74 @@
+package logic;
+
+import com.google.gson.annotations.SerializedName;
+import java.util.LinkedList;
+import java.util.List;
+import org.json.JSONArray;
+
+/**
+ *
+ * @author ite102770
+ */
+public class Stations {
+
+    private int identifier;
+    private Position position;
+    private Station[] cab;//cab
+    private Station[] bus;
+    private Station[] tube;//train
+    private Station[] boat;
+    private Object obj;
+    public List<Station> data;
+
+    JSONArray jarray = null;
+
+    public Stations(List<Station> data) {
+        this.data = data;
+        for (int i = 0; i < data.size(); i++) {
+            identifier = i;
+            position = data.get(i).getPos();
+            tube = data.get(i).getTrainNeighbors();
+            bus = data.get(i).getBusNeighbors();
+            cab = data.get(i).getTaxiNeighbors();
+            boat = data.get(i).getBoatNeighbors();
+            data.add(new Station(i, position, tube, bus, cab, boat));
+        }
+
+    }
+
+//    public Station[] getStationArray() {
+//        return s;
+//    }
+    public int getIdentifier() {
+        return identifier;
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    public Station[] getCab() {
+        return cab;
+    }
+
+    public Station[] getBus() {
+        return bus;
+    }
+
+    public Station[] getTube() {
+        return tube;
+    }
+
+    public Station[] getBoat() {
+        return boat;
+    }
+
+    public Object getObj() {
+        return obj;
+    }
+
+    public JSONArray getJarray() {
+        return jarray;
+    }
+
+}

@@ -1,0 +1,52 @@
+{
+  "misterX": {
+    "ai": true,
+    "possibleTargets": [],
+    "lastShownPos": 13,
+    "currPos": 13,
+    "remainingTickets": [
+      4,
+      3,
+      8,
+      2
+    ],
+    "journeyBoard": [
+      2,
+      2,
+      3
+    ]
+  },
+  "detectives": {
+    "noOfDetectives": 3,
+    "ai": false,
+    "players": [
+      {
+        "position": 68,
+        "remainingTickets": [
+          4,
+          8,
+          8
+        ]
+      },
+      {
+        "position": 139,
+        "remainingTickets": [
+          4,
+          8,
+          8
+        ]
+      },
+      {
+        "position": 104,
+        "remainingTickets": [
+          4,
+          8,
+          8
+        ]
+      }
+    ]
+  },
+  "whosTurn": 1,
+  "currRoundNo": 3,
+  "gameIsWon": false
+}

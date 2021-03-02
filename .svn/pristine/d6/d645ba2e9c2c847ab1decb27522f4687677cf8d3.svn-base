@@ -1,0 +1,324 @@
+package logic;
+
+/**
+ * this class is responsible for input and output, reading the json file and
+ * store it in an array of stations. it also saves the game with given
+ * parameters in a json file. and last one is loading the game with given
+ * parameters and return the new game.
+ */
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonReader;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.List;
+import java.util.Scanner;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+public class IO {
+
+    //String inPath = "C:\\Users\\Reyhan\\Desktop\\map.json";
+    FileOutputStream f = null;
+    FileChooser fileChooser = null;
+    OutputStreamWriter o = null;
+    Object saveObj;
+    GUIConnector gui;
+    Game game;
+    SaveObj saveobject;
+    SaveObj loadObject;
+    Object obj;
+    int errorNum = 0;
+
+    public IO() throws JSONException {
+        getJsonValues();
+    }
+
+    public Stations[] getJsonValues() throws JSONException {
+        Gson gson = new Gson();
+        JSONArray jarray = null;
+        Stations[] stations = new Stations[199];
+        JsonValidation validation;
+        try {
+            FileReader reader = new FileReader("net.json");
+            JsonReader jreader = new JsonReader(reader);
+
+            JsonStation js = gson.fromJson(jreader, JsonStation.class);
+            validation = new JsonValidation(js.getStations());
+            if(validation.getErrorLoadNumber() ==0){
+
+            for (int i = 0; i < js.getStations().length; i++) {
+                stations[i] = js.getStations()[i];
+            }
+            }
+
+        } catch (FileNotFoundException e) {
+
+        } catch (com.google.gson.JsonParseException e) {
+            gui.showMsg(errorNum);
+        }
+        return stations;
+    }
+
+    public Object getMapJson() {
+        return this.obj;
+    }
+
+    public static boolean isJSONValid(String test) {
+        try {
+            JSONObject jsonObject = new JSONObject(test);
+        } catch (JSONException ex) {
+            // edited, to include @Arthur's comment
+            // e.g. in case JSONArray is valid as well...
+            try {
+                JSONArray jsonArray = new JSONArray(test);
+            } catch (JSONException ex1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void saveField(SaveObj saveObject)
+            throws IOException, JSONException {
+        this.saveobject = saveObject;
+        FileChooser chooser = new FileChooser();
+        chooser.setInitialDirectory(new File(System.getProperty("user.dir")));
+        chooser.setTitle("Choose location To Save Report");
+        File selectedFile = null;
+        if (selectedFile == null) {
+            chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter(".json", ".json"),
+                    new ExtensionFilter(".txt", ".txt"));
+            selectedFile = chooser.showSaveDialog(null);
+        }
+        if (selectedFile != null) {
+            saveObj = setSave();
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+            try (FileWriter writer = new FileWriter(selectedFile.getPath())) {
+                gson.toJson(setSave(), writer);
+                //JSON.write(writer, data);
+                //  writer.endObject();
+                writer.flush();
+            } catch (IOException e) {
+            }
+        }
+    }
+
+    /**
+     * create json object for each type of player with the given parameters,
+     * idxPalyer is the id of the current player, p is the array of players and
+     * lastShonPos is the last shown position of mister x.
+     *
+     * @param p
+     * @param idxPlayer
+     * @param lastShowPos
+     * @return
+     * @throws JSONException
+     */
+    private Object setSave() throws JSONException {
+        int[] possibleTargets = new int[0];
+        int[] remainingTikets = saveobject.getRemainingTickets();
+        List<Integer> journeyBoard = saveobject.getJourneyBoard();
+        JsonArray players;
+        JsonObject MisterX = new JsonObject(); //add new json object
+        JsonObject detectives = new JsonObject();
+        //mister x
+        MisterX.addProperty("ai", saveobject.isMisterXAI());//mister x is AI or not
+        MisterX.add("possibleTargets", new Gson().toJsonTree(possibleTargets));//add json lement to object
+        MisterX.addProperty("lastShownPos", saveobject.lastShownPos);
+        MisterX.addProperty("currPos", saveobject.getCurrPosOfMisterX());//add value to json object
+        MisterX.add("remainingTickets", new Gson().toJsonTree(remainingTikets));
+        MisterX.add("journeyBoard", new Gson().toJsonTree(journeyBoard));
+        //detectives
+        players = new JsonArray();
+        for (int i = 1; i < saveobject.getPlayers().length; i++) {
+            JsonObject playersChilds = new JsonObject();
+            int[] reaminigTicketDetc = new int[saveobject.getPlayers()[i].getAllTickets().length -1];
+            for (int j = 0; j < reaminigTicketDetc.length; j++) {
+                reaminigTicketDetc[j] = saveobject.getPlayers()[i].getAllTickets()[j];
+                
+            }
+            playersChilds.addProperty("position", saveobject.getPlayers()[i].getCurrStation());
+            playersChilds.add("remainingTickets", new Gson().toJsonTree(reaminigTicketDetc));
+            //players.set(i, playersChilds);
+            players.add(playersChilds);
+        }
+        detectives.addProperty("noOfDetectives", saveobject.getPlayers().length - 1);
+        detectives.addProperty("ai", saveobject.isDetectiveAI());
+        detectives.add("players", new Gson().toJsonTree(players));
+
+        //players.add(new Gson().toJsonTree(MisterX));
+        JsonObject mainObj = new JsonObject();
+        mainObj.add("misterX", new Gson().toJsonTree(MisterX));
+        mainObj.add("detectives", new Gson().toJsonTree(detectives));
+        System.out.println(" ++++++  whose turn save " + saveobject.getWhosTurn());
+        mainObj.addProperty("whosTurn", saveobject.getWhosTurn());
+        mainObj.addProperty("currRoundNo", saveobject.getPlayers()[0].getJournyList().size());
+        mainObj.addProperty("gameIsWon", saveobject.getIsWon());
+        MisterX = mainObj;
+        return MisterX;
+    }
+
+    /**
+     * read the file and convert each line of file to symbol/
+     *
+     * @param gui
+     * @param game
+     * @return
+     * @throws IOException
+     * @throws org.json.JSONException
+     */
+    public Game loadFile(GUIConnector gui, Game game) throws IOException, JSONException {
+        this.gui = gui;
+        this.game = game;
+        String line = "";
+        String fileString = "";
+        FileReader fr = null;
+        BufferedReader br = null;
+        InputStreamReader sr = null;
+        Scanner sc = null;
+        FileChooser chooser = new FileChooser();
+        chooser.setInitialDirectory(new File(System.getProperty("user.dir")));
+        chooser.setTitle("Choose your load file");
+        File selectedFile = null;
+        if (selectedFile == null) {
+            selectedFile = chooser.showOpenDialog(null);
+        }
+        try {
+            if (selectedFile != null) {
+                fr = new FileReader(selectedFile.getPath());
+                sr = new InputStreamReader(System.in);
+                // work
+                br = new BufferedReader(fr);
+                sc = new Scanner(sr);
+                while ((line = br.readLine()) != null) {
+                    fileString = fileString + line + "\n";
+                }
+            }
+        } finally {
+            // close
+            if (sc != null) {
+                sc.close();
+            }
+            if (br != null) {
+                br.close();
+            }
+            if (sr != null) {
+                sr.close();
+            }
+            if (fr != null) {
+                fr.close();
+            }
+        }
+        return selectedFile != null ? loadAllFileString(fileString) : this.game;
+    }
+
+    /**
+     * convert the given string to board by splitting each line.
+     *
+     * @param fileString is the given file to convert
+     * @return a new game with all elements inside the converted board
+     */
+    private Game loadAllFileString(String fileString) throws JSONException, IOException {
+        Gson gson = new Gson();
+        Object obj;
+        obj = gson.fromJson(fileString, Object.class);
+        JSONObject json = new JSONObject(obj.toString());
+
+        //JSONObject json = new JSONObject(fileString);
+        JSONObject misterX = json.getJSONObject("misterX");
+        // JSONObject remainingTicket = misterX.getJSONObject("remainingTikets");
+        JSONArray remainingTicket = misterX.getJSONArray("remainingTickets");
+
+        int[] remainingTicketKeys = new int[4];
+        for (int j = 0; j < remainingTicket.length(); j++) {
+            remainingTicketKeys[j] = remainingTicket.getInt(j);
+        }
+        for (int i = 0; i < remainingTicketKeys.length; i++) {
+            System.out.println("remainign Tickets" + remainingTicketKeys[i]);
+        }
+        int idxPlayer = json.getInt("whosTurn");
+        boolean isWon = json.getBoolean("gameIsWon");
+        boolean misterXAI = json.get("misterX").equals("ai");
+        int currPos = misterX.getInt("currPos");
+        boolean detectiveAI = json.get("detectives").equals("ai");
+        JSONObject detectives = (JSONObject) json.get("detectives");
+        int noOfDetectives = detectives.getInt("noOfDetectives");
+        Player[] p = new Player[1 + noOfDetectives];
+        System.out.println("no of detec" + noOfDetectives);
+        JSONObject[] detecPlayers = new JSONObject[noOfDetectives];
+        JSONArray[] remainingTicketDetec = new JSONArray[detecPlayers.length];
+        int[][] remainingTicketDetecKeys = new int[detecPlayers.length][4];
+        // String[] stringArray = new String[remainingTicketDetec.length];
+        int[] posDetecives = new int[p.length - 1];
+        //SaveObj loadObj = new SaveObj(p, idxPlayer, noOfDetectives, isWon);
+        for (int i = 0; i < p.length - 1; i++) {//store all players in jsonobjects
+            detecPlayers[i] = detectives.getJSONArray("players").getJSONObject(i);
+        }
+        for (int i = 0; i < detecPlayers.length; i++) {//get the remainingtickets values and store in object array
+            remainingTicketDetec[i] = detecPlayers[i].optJSONArray("remainingTickets");
+        }
+//        for (int i = 0; i < p.length - 1; i++) {
+//            System.out.println(" // " + remainingTicketDetec[i]);
+//        }
+        for (int i = 0; i < detecPlayers.length; i++) {
+            for (int j = 0; j < remainingTicketDetec.length; j++) {
+                remainingTicketDetecKeys[i][j] = remainingTicketDetec[i].getInt(j);
+            }
+        }
+//        for (int i = 0; i < remainingTicketDetec.length; i++) {
+//            for (int j = 0; j < remainingTicketDetec.length; j++) {
+//                System.out.println("remaining Tickets  detecs ***  " + remainingTicketDetecKeys[i][j]);
+//            }
+//        }
+        for (int i = 0; i < p.length - 1; i++) {
+            posDetecives[i] = detecPlayers[i].getInt("position");
+        }
+//        for (int i = 0; i < p.length - 1; i++) {
+//            System.out.println("pos detectives  " + posDetecives[i]);
+//        }
+
+        p[0] = new MisterX(0, playerType.MISTERX, misterXAI, remainingTicketKeys[0],
+                remainingTicketKeys[1], remainingTicketKeys[2], remainingTicketKeys[3]);
+
+        System.out.println("p length " + p.length + " nom of detec" + noOfDetectives);
+        for (int i = 1; i < p.length; i++) {
+            p[i] = new Detectives(i,
+                    playerType.BLUE,
+                    detectiveAI,
+                    remainingTicketDetecKeys[i - 1][0],
+                    remainingTicketDetecKeys[i - 1][1], remainingTicketDetecKeys[i - 1][2], remainingTicketDetecKeys[i - 1][3]);
+        }
+        // set the current position for players 
+        p[0].setCurrStation(currPos);
+        for (int i = 1; i < p.length; i++) {
+            p[i].setCurrStation(posDetecives[i - 1]);
+        }
+        for (int i = 0; i < p.length; i++) {
+            System.out.println(" +++  " + p[i].toString());
+        }
+        int errorFormat = 0;
+        Board temp = new Board();
+        if (temp != null) {
+            this.game = new Game(temp, gui, p, idxPlayer, noOfDetectives, isWon);
+        } else {
+            errorFormat = 1;
+            gui.showMsg(errorFormat);
+        }
+
+        return this.game;
+    }
+}

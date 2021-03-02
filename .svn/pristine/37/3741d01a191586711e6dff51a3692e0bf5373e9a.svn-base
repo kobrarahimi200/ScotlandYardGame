@@ -1,0 +1,211 @@
+package logic;
+
+import java.util.LinkedList;
+import java.util.List;
+
+/**
+ *
+ * @author Reyhan
+ */
+public class Player {
+
+    private int id;
+    private final playerType type;
+    private boolean isAI;
+    private int boats;
+    private int taxis;
+    private int buses;
+    private int trains;
+    private int station;
+    private int prevStation;
+    private int aiID;
+
+    public Player(int id, playerType type, boolean isAI, int numOfTrains, int numOfBuses, int numOfTaxis,
+            int numOfBoats) {
+        this.id = id;
+        this.type = type;
+        this.isAI = isAI;
+        this.taxis = numOfTaxis;
+        this.trains = numOfTrains;
+        this.boats = numOfBoats;
+        this.buses = numOfBuses;
+        this.station = 0;
+        this.prevStation = 0;
+        if (isAI) {
+            aiID = 1;
+        } else {
+            aiID = 0;
+        }
+
+    }
+
+    /**
+     * return the player type
+     *
+     * @return
+     */
+    playerType getPlayerType() {
+        return this.type;
+    }
+
+    /**
+     * increment the number of given ticket type
+     *
+     * @param ticketTytpe
+     */
+    void incTicket(Tickets ticketTytpe) {
+        if (null != ticketTytpe) {
+            switch (ticketTytpe) {
+                case TAXI:
+                    taxis++;
+                    break;
+                case BUS:
+                    buses++;
+                    break;
+                case BOAT:
+                    boats++;
+                    break;
+                case TRAIN:
+                    trains++;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    /**
+     * decrease the number of given ticket type
+     *
+     * @param ticketTytpe
+     */
+    void decTicket(Tickets ticketTytpe) {
+        if (null != ticketTytpe) {
+            switch (ticketTytpe) {
+                case TAXI:
+                    taxis--;
+                    break;
+                case BUS:
+                    buses--;
+                    break;
+                case BOAT:
+                    boats--;
+                    break;
+                case TRAIN:
+                    trains--;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    /**
+     * used for logging
+     *
+     * @return
+     */
+    protected int getaiID() {
+        return this.aiID;
+    }
+
+    /**
+     * used for logging one is true AI zero is human
+     *
+     * @param aiID
+     */
+    protected void setAiID(int aiID) {
+        this.aiID = aiID;
+    }
+
+    /**
+     * return true if the current player is AI
+     *
+     * @return
+     */
+    protected boolean isAI() {
+        return isAI;
+    }
+
+    protected int getNumOfTaxis() {
+        return this.taxis;
+    }
+
+    protected int getNumOfBuses() {
+        return this.buses;
+    }
+
+    protected int getNumOfTrains() {
+        return this.trains;
+    }
+
+    protected int getNumOfBoats() {
+        return this.boats;
+    }
+
+    protected int getCurrStation() {
+        return this.station;
+    }
+
+    protected int getPrevStation() {
+        return this.prevStation;
+    }
+
+    protected void setCurrStation(int station) {
+        this.station = station;
+    }
+
+    protected void setprevStation(int station) {
+        this.prevStation = station;
+    }
+
+    int[] getAllTickets() {
+        return new int[]{getNumOfTrains(), getNumOfBuses(), getNumOfTaxis(), getNumOfBoats()};
+    }
+
+    protected void incNumOfTurns() {
+    }
+
+    protected int getnumOfTurns() {
+        return 0;
+    }
+
+    /**
+     * return the last position which mister x is shown
+     *
+     * @return
+     */
+    protected int lastShownPos() {
+        return 0;
+    }
+
+    protected void addToJourneyList(Tickets ticket) {
+    }
+
+    protected List<Integer> getJournyList() {
+        return new LinkedList<>();
+    }
+
+    /**
+     * used for AI part of mister x
+     *
+     * @param board
+     * @param p
+     * @return
+     */
+    List<Station> getAllFreeNeighbors(Board board, Player[] p) {
+        return null;
+    }
+
+    void AI(Board board, Player[] p) {
+    }
+
+    int countPossibleFreeStations(Board board, Player[] p, Station s) {
+        return 0;
+    }
+
+    @Override
+    public String toString() {
+        return "player" + type + " " + id + "with tickets : " + trains + " " + buses + " " + taxis + " " + boats + '}';
+    }
+}

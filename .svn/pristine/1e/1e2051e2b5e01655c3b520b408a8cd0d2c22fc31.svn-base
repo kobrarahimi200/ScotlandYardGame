@@ -1,0 +1,72 @@
+package logic;
+
+import org.json.JSONArray;
+
+/**
+ *
+ * @author ite102770
+ */
+public class Stations {
+
+    private int identifier;
+    private Position position;
+    private int[] cab;//cab
+    private int[] bus;
+    private int[] tube;//train
+    private int[] boat;
+    private Object obj;
+    Station[] s;
+
+    JSONArray jarray = null;
+
+    public Stations() {
+//        for (int i = 0; i < st.length; i++) {
+//            identifier = i;
+//            position = st[i].getPos();
+//            tube = st[i].getTrainNeighbors();
+//            bus = st[i].getBusNeighbors();
+//            cab = st[i].getTaxiNeighbors();
+//            boat = st[i].getBoatNeighbors();
+//            s[i] = new Station(i, st[i].getPos(), st[i].getTrainNeighbors(),
+//                    st[i].getBusNeighbors(), st[i].getTaxiNeighbors(), st[i].getBoatNeighbors());
+//        }
+
+    }
+
+    public Station[] getStationArray() {
+        return s;
+    }
+
+    public int getIdentifier() {
+        return identifier;
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    public int[] getCab() {
+        return cab;
+    }
+
+    public int[] getBus() {
+        return bus;
+    }
+
+    public int[] getTube() {
+        return tube;
+    }
+
+    public int[] getBoat() {
+        return boat;
+    }
+
+    public Object getObj() {
+        return obj;
+    }
+
+    public JSONArray getJarray() {
+        return jarray;
+    }
+
+}

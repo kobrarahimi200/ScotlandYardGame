@@ -1,0 +1,177 @@
+package logic;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+/**
+ *
+ * @author Reyhan
+ */
+public class MisterX extends Player {
+
+    int numOfTurns;
+    private int lastShowPos;
+    private List<Integer> journeyBoard; // store all used ticket
+    List<Station> neighborsMisterX;
+
+    public MisterX(int id, playerType type, boolean isAI, int numOfTrains, int numOfBuses, int numOfTaxis, int numOfBoats) {
+        super(id, type, isAI, numOfTrains, numOfBuses, numOfTaxis, numOfBoats);
+        this.numOfTurns = 0;
+        lastShowPos = 0;
+        journeyBoard = new ArrayList<>();
+    }
+
+    @Override
+    protected List<Integer> getJournyList() {
+        return journeyBoard;
+    }
+
+    @Override
+    protected int getnumOfTurns() {
+        return numOfTurns;
+    }
+
+    @Override
+    protected void incNumOfTurns() {
+        numOfTurns++;
+    }
+
+    @Override
+    protected int lastShownPos() {
+        return lastShowPos;
+    }
+
+    @Override
+    protected void addToJourneyList(Tickets ticket) {
+        journeyBoard.add(Tickets.valueOf(ticket.toString()).ordinal());
+    }
+
+    /**
+     * calculates the first condition (numOfDetectives - detectiviesAccess)*10
+     * second condition :( numOfFreeNeighbors of neighbors / 13)*4
+     *
+     * @param board
+     * @param p
+     */
+    @Override
+    void AI(Board board, Player[] p) {
+        int sum = 0;
+        int second = 0;
+        List<Station> neighbors = getAllFreeNeighbors(board, p);
+        for (int i = 0; i < neighbors.size(); i++) {
+            int temp = 0;
+            second = 0;
+            if (board.canPlay(neighbors.get(i).getIdentifier(), this)) {
+                temp += ((p.length - 1) - countDetectiveAccess(board, p, neighbors.get(i))) * 10;
+                second += (countPossibleFreeStations(board, p, neighbors.get(i)) / 13)*4;
+
+            }
+            if (temp > sum) {
+                sum = temp;
+            }
+            System.out.println("second " + second);
+            System.out.println("sum " + sum + " " + neighbors.size() + " " + p.length);
+            System.out.println("temp AI " + temp + "id " + neighbors.get(i).getIdentifier());
+            System.out.println("numOfDetecNei "
+                    + countDetectiveAccess(board, p, neighbors.get(i)));
+
+        }
+
+    }
+//TODO: write agian canPlay method which checks if have enough ticket and decrease it during cheking
+
+    /**
+     * store all neighbors of neighbors of current station of mister x that they
+     * do not contain the detectives
+     *
+     * @param board
+     * @param p
+     * @param s is the all neighbors of mister x(neighborsMisterX list)
+     * @return
+     */
+    @Override
+    int countPossibleFreeStations(Board board, Player[] p, Station s) {
+        int count = 0;
+        System.out.println("size " + board.getAllStations().size());
+        boolean added;
+        List<Station> st = new LinkedList<>();
+        for (int i = 0; i < board.getAllStations().size(); i++) {
+            added = false;
+            if (s.isNeihbor(i + 1) && !st.contains(board.getAllStations().get(i))) {
+                st.add(board.getAllStations().get(i));
+                added = true;
+            }
+
+            for (int j = 1; j < p.length && added; j++) {
+                if (!s.canPlay(i + 1, this)
+                        || p[j].getCurrStation() == board.getAllStations().get(i).getIdentifier()) {
+                    System.out.println("station " + s.getIdentifier() + " " + s.getBoatNeighbors().length);
+                    st.remove(board.getAllStations().get(i));
+                }
+            }
+        }
+
+        return st.size();
+    }
+
+    /**
+     * gets all neighbors of mister x and store into a list and remove all nodes
+     * contains detectives
+     *
+     * @param board
+     * @param p
+     * @return
+     */
+    @Override
+    List<Station> getAllFreeNeighbors(Board board, Player[] p) {
+        neighborsMisterX = new LinkedList<>();
+
+        for (int i = 0; i < board.getAllStations().size(); i++) {
+            if (board.getStation(this.getCurrStation()).isNeihbor(i + 1)) {
+                neighborsMisterX.add(board.getAllStations().get(i));
+            }
+        }
+        neighborsMisterX = removeDetectiveFrom(p);
+        return neighborsMisterX;
+    }
+
+    /**
+     * remove stations from neighborsMisterX which contains detectives
+     *
+     * @param p
+     * @return
+     */
+    private List<Station> removeDetectiveFrom(Player[] p) {
+        for (int j = 1; j < p.length; j++) {
+            for (int i = 0; i < neighborsMisterX.size(); i++) {
+                if (p[j].getCurrStation() == neighborsMisterX.get(i).getIdentifier()) {
+                    neighborsMisterX.remove(i);
+                }
+            }
+        }
+        return neighborsMisterX;
+    }
+
+    /**
+     * counts the number of neighbor station of mister x which detective can
+     * reach them
+     *
+     * @param board
+     * @param p
+     * @param s
+     * @return
+     */
+    private int countDetectiveAccess(Board board, Player[] p, Station s) {
+        int x = 0;
+        for (int i = 1; i < p.length; i++) {
+            if (board.isNeighbor(p[i].getCurrStation(), s.getIdentifier())
+                    && board.canPlay(s.getIdentifier(), p[i])) {
+                x++;
+            }
+        }
+        System.out.println("NOOfdetective Access" + x + ", station: " + s.getIdentifier());
+        return x;
+    }
+
+}

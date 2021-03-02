@@ -1,0 +1,124 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package logic;
+
+/**
+ *
+ * @author Reyhan
+ */
+public class Player {
+
+    private int id;
+    private final playerType type;
+    private boolean isAI;
+    private int boats;
+    private int taxis;
+    private int buses;
+    private int trains;
+    private int station;
+    //  private playerType type;
+
+    public Player(int id, playerType type, boolean isAI, int numOfTrains,int numOfBuses, int numOfTaxis, 
+            int numOfBoats ) {
+        this.id = id;
+        this.type = type;
+        this.isAI = isAI;
+        this.taxis = numOfTaxis;
+        this.trains = numOfTrains;
+        this.boats = numOfBoats;
+        this.buses = numOfBuses;
+        this.station = 0;
+    }
+
+    playerType getPlayerType() {
+        return this.type;
+    }
+
+    /**
+     * increment the number of given ticket type
+     *
+     * @param ticketTytpe
+     */
+    void incTicket(Tickets ticketTytpe) {
+
+        if (null != ticketTytpe) {
+            switch (ticketTytpe) {
+                case TAXI:
+                    taxis++;
+                    break;
+                case BUS:
+                     buses++;
+                    break;
+                case BOAT:
+                    boats++;
+                    break;
+                case TRAIN:
+                    trains++;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    /**
+     * decrease the number of given ticket type
+     *
+     * @param ticketTytpe
+     */
+    void decTicket(Tickets ticketTytpe) {
+        
+        if (null != ticketTytpe) {
+            switch (ticketTytpe) {
+                case TAXI:
+                    taxis--;
+                    break;
+                case BUS:
+                     buses--;
+                    break;
+                case BOAT:
+                     boats--;
+                    break;
+                case TRAIN:
+                    trains--;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    protected int getNumOfTaxis() {
+        return this.taxis;
+    }
+
+    protected int getNumOfBuses() {
+        return this.buses;
+    }
+
+    protected int getNumOfTrains() {
+        return this.trains;
+    }
+
+    protected int getNumOfBoats() {
+        return this.boats;
+    }
+
+    protected int getCurrStation() {
+        return this.station;
+    }
+
+    protected void setCurrStation(int station) {
+        this.station = station;
+    }
+    int[] getAllTickets(){
+        return new int[]{getNumOfTrains(), getNumOfBuses(), getNumOfTaxis(), getNumOfBoats()};
+    }
+     protected void incNumOfTurns(){}
+      protected int getnumOfTurns(){return 0;}
+    
+
+}

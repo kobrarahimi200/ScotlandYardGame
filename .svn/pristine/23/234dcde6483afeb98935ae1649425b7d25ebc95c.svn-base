@@ -1,0 +1,16 @@
+package logic;
+
+/**
+ * this class is implemented for another type of players (Detectives) with all
+ * required methods
+ *
+ * @author Reyhan
+ */
+public class Detectives extends Player {
+
+    public Detectives(int id, playerType type, boolean isAI, int numOfTrains, int numOfBuses, int numOfTaxis,
+            int numOfBoats) {
+        super(id, type, isAI, numOfTrains, numOfBuses, numOfTaxis, numOfBoats);
+    }
+
+}

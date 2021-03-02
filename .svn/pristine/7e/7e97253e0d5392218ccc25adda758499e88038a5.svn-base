@@ -1,0 +1,55 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package logic;
+
+import com.google.gson.Gson;
+import org.junit.Test;
+import static org.junit.Assert.*;
+import logic.IO;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+/**
+ *
+ * @author Alireza
+ */
+public class JsonValidationTest  {
+
+   
+    IO Io;
+   
+
+
+    @Test
+    public void checkIfHasStation() throws JSONException {
+        Io = new IO();
+        Object obj = Io.getMapJson();
+        JsonValidation jsonValidation = new JsonValidation((Stations[]) obj);
+        assertEquals(0, jsonValidation.getErrorNumber());
+    }
+    @Test
+    public void checkIfIdentifierIsValid() throws JSONException {
+        Io = new IO();
+        Object obj = Io.getMapJson();
+        JsonValidation jsonValidation = new JsonValidation((Stations[]) obj);
+        assertEquals(0, jsonValidation.getErrorNumber());
+    }
+   @Test
+    public void TestEmptyJsonFile() throws JSONException {
+        Io = new IO();
+        Object obj = new Object();
+        JsonValidation jsonValidation = new JsonValidation((Stations[]) obj);
+        assertEquals(16, jsonValidation.getErrorNumber());
+    }
+     @Test
+    public void TestLoadFileValidation_misterX() throws JSONException {
+        Io = new IO();
+        Object obj = new Object();
+        JsonValidation jsonValidation = new JsonValidation(Io.getJsonValues());
+        assertEquals(0, jsonValidation.getErrorLoadNumber());
+    }
+
+}

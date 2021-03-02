@@ -1,0 +1,323 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package gui;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.beans.value.ChangeListener;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+import logic.Game;
+import org.json.JSONException;
+
+/**
+ *
+ * @author Reyhan
+ */
+public class FXMLDocumentController implements Initializable {
+
+    private Label label;
+    @FXML
+    private Pane outerPane;
+    @FXML
+    private Pane innerPane;
+    private final String imgPath = "gui/img/";
+    private final String imgExt = ".bmp";
+    @FXML
+    private GridPane grdMisterXTickets;
+    @FXML
+    private GridPane grdTickets;
+    private ComboBox drpNumOfDetectives;
+    private CheckBox checkBoxMisterX;
+    private CheckBox checkBoxDetective;
+    ImageView imgViewMap;
+    double coordX = 0;
+    double coordY = 0;
+    private Pane paneAI;
+    JavaFxGUI gui;
+    Game game;
+    private boolean AIMisterX = false;
+    private boolean AIDetectives = false;
+    private int numOfDetectives = 3;
+    @FXML
+    private Label idxPlayer;
+    @FXML
+    private Label lblNumOfTaxi;
+    @FXML
+    private Label lblNumOfBuses;
+    @FXML
+    private Label lblNumOfTrains;
+    @FXML
+    private Label lblNumOfBoats;
+    private Label[] lblArrays = new Label[24];
+    @FXML
+    private Label lbl2;
+    @FXML
+    private Label lbl3;
+    @FXML
+    private Label lbl5;
+    @FXML
+    private Label lbl1;
+    @FXML
+    private Label lbl4;
+    @FXML
+    private Label lbl6;
+    @FXML
+    private Label lbl7;
+    @FXML
+    private Label lbl9;
+    @FXML
+    private Label lbl10;
+    @FXML
+    private Label lbl11;
+    @FXML
+    private Label lbl12;
+    @FXML
+    private Label lbl14;
+    @FXML
+    private Label lbl16;
+    @FXML
+    private Label lbl15;
+    @FXML
+    private Label lbl17;
+    @FXML
+    private Label lbl22;
+    @FXML
+    private Label lbl21;
+    @FXML
+    private Label lbl20;
+    @FXML
+    private Label lbl19;
+    @FXML
+    private Label lbl23;
+    @FXML
+    private Label lbl8;
+    @FXML
+    private Label lbl13;
+    @FXML
+    private Label lbl18;
+    @FXML
+    private Label lbl24;
+    private Label lblQuestion= new Label(" ");;
+
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        setImageToButtons();
+        this.innerPane.setDisable(true);
+        double width = innerPane.getPrefWidth();
+        double height = innerPane.getPrefHeight();
+        storeInLblArray();
+        try {
+            firstWindowsPlayersSetting();
+        } catch (IOException ex) {
+            Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        ChangeListener<Number> stageSizeListener = (observable, oldValue, newValue) -> {
+            int diffWidth = (int) (outerPane.getWidth() - outerPane.getPrefWidth());
+            int diffHeight = (int) (outerPane.getHeight() - outerPane.getPrefHeight());
+            //System.out.println("width " + width + " height " + height);
+            innerPane.setPrefWidth(width + Math.min(diffWidth, diffHeight));
+            innerPane.setPrefHeight(height + Math.min(diffWidth, diffHeight));
+        };
+        outerPane.widthProperty().addListener(stageSizeListener);
+        outerPane.heightProperty().addListener(stageSizeListener);
+
+    }
+
+    @FXML
+    private void onClickBtnStart(ActionEvent event) throws JSONException, IOException {
+         storeInLblArray();
+         setImageToButtons();
+        this.innerPane.setDisable(true);
+        if (game != null) {
+            this.game.clear();
+        }
+        firstWindowsPlayersSetting();
+        
+        
+    }
+
+    private void onClickBtnOk(ActionEvent event) throws JSONException {
+        this.paneAI.setDisable(true);
+        this.grdMisterXTickets.setDisable(false);
+        this.grdTickets.setDisable(false);
+        if (checkBoxMisterX.isSelected()) {
+            this.AIMisterX = true;
+        } else {
+            this.AIMisterX = false;
+        }
+        if (checkBoxDetective.isSelected()) {
+            this.AIDetectives = true;
+        } else {
+            this.AIDetectives = false;
+        }
+        numOfDetectives = Integer.parseInt(drpNumOfDetectives.getSelectionModel().getSelectedItem().toString());
+        System.out.println("misterX " + AIMisterX + "Detec  " + AIDetectives
+                + " DropDown " + numOfDetectives);
+        this.game = new Game(1, this.numOfDetectives, AIMisterX, AIDetectives, gui);
+
+        System.out.println("coordx" + coordX + "xoordy " + coordY);
+        this.game.assignStartingPoint();
+
+    }
+
+    private void setImageToButtons() {
+        //rotate button picture 
+        imgViewMap = new ImageView();
+        imgViewMap.setImage(new Image(imgPath + "Spielplan" + imgExt));
+        innerPane.getChildren().add(imgViewMap);
+        imgViewMap.fitWidthProperty().bind(innerPane.widthProperty());
+        imgViewMap.fitHeightProperty().bind(innerPane.heightProperty());
+    }
+
+    /**
+     * with this action event exit from the game and windows is closed
+     *
+     * @param event
+     */
+    @FXML
+    private void exit(ActionEvent event) {
+        ScotlandYard_Rahimi.mainLoginScene.getWindow().hide();
+    }
+    /**
+     * with this action event exit from the game and windows is closed
+     *
+     * @param event
+     */
+    @FXML
+    private void save(ActionEvent event) throws JSONException {
+        this.game.save();
+    }
+    @FXML
+    private void onClickMap(MouseEvent event) {
+            coordX = event.getX();
+            coordY = event.getY();
+            this.game.setCoordinates(coordX, coordY, innerPane.getWidth(), innerPane.getHeight());
+            try {
+                this.game.displayPlayer(this.game);
+            } catch (JSONException ex) {
+                Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+//           lblQuestion.setOnMouseClicked(e -> {
+//            coordX = e.getScreenX();
+//            coordY = e.getScreenY();
+//            this.game.setCoordinates(coordX, coordY, innerPane.getWidth(), innerPane.getHeight());
+//            try {
+//                this.game.displayPlayer(this.game);
+//            } catch (JSONException ex) {
+//                Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
+//            } catch (InterruptedException ex) {
+//                Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//        });
+    }
+
+    private void firstWindowsPlayersSetting() throws IOException {
+        Label secondLabel = new Label("Detectives");
+        ComboBox comboBox = new ComboBox();
+        comboBox.getItems().addAll("3", "4", "5");
+        comboBox.setValue("3");
+        CheckBox misterX = new CheckBox("AIMisterX");
+        CheckBox detectiveSelection = new CheckBox("AIDetectives");
+        misterX.setSelected(true);
+        Button btnOk = new Button("OK");
+        StackPane secondaryLayout = new StackPane();
+        secondaryLayout.getChildren().addAll(secondLabel, comboBox, misterX, detectiveSelection);
+        secondaryLayout.getChildren().add(btnOk);
+        btnOk.setPrefSize(75, 25);
+        secondLabel.setTranslateX(-65);
+        secondLabel.setTranslateY(-50);
+        comboBox.setTranslateX(30);
+        comboBox.setTranslateY(-50);
+        misterX.setTranslateX(-60);
+        misterX.setTranslateY(0);
+        detectiveSelection.setTranslateX(-50);
+        detectiveSelection.setTranslateY(20);
+        btnOk.setTranslateX(0);
+        btnOk.setTranslateY(50);
+        Scene secondScene = new Scene(secondaryLayout, 250, 150);
+        // New window (Stage)
+        Stage smallWindow = new Stage();
+        smallWindow.setTitle("First Stage");
+        smallWindow.setScene(secondScene);
+        // Set position of second window, related to primary window.
+        smallWindow.setX(500);
+        smallWindow.setY(500);
+        smallWindow.setAlwaysOnTop(true);
+        smallWindow.show();
+        btnOk.setOnAction((ActionEvent e) -> {
+            if (comboBox.getValue().equals("3")) {
+                numOfDetectives = 3;
+            } else if (comboBox.getValue().equals("4")) {
+                numOfDetectives = 4;
+
+            } else if (comboBox.getValue().equals("5")) {
+                numOfDetectives = 5;
+            } else {
+                numOfDetectives = 3;
+            }
+            //TODO : changed his part from if condition to this format
+            this.AIMisterX = misterX.isSelected();
+            this.AIDetectives = detectiveSelection.isSelected();
+            smallWindow.close();
+            gui = new JavaFxGUI(grdMisterXTickets, grdTickets, innerPane, imgViewMap, idxPlayer,
+                    lblNumOfTrains, lblNumOfBuses, lblNumOfTaxi, lblNumOfBoats, lblArrays,lblQuestion );
+            try {
+                this.game = new Game(1, this.numOfDetectives, AIMisterX, AIDetectives, gui);
+            } catch (JSONException ex) {
+                Logger.getLogger(FXMLDocumentController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            this.innerPane.setDisable(false);
+        });
+    }
+
+    private void storeInLblArray() {
+        lblArrays[0] = lbl1;
+        lblArrays[1] = lbl2;
+        lblArrays[2] = lbl3;
+        lblArrays[3] = lbl4;
+        lblArrays[4] = lbl5;
+        lblArrays[5] = lbl6;
+        lblArrays[6] = lbl7;
+        lblArrays[7] = lbl8;
+        lblArrays[8] = lbl9;
+        lblArrays[9] = lbl10;
+        lblArrays[10] = lbl1;
+        lblArrays[11] = lbl2;
+        lblArrays[12] = lbl13;
+        lblArrays[13] = lbl14;
+        lblArrays[14] = lbl15;
+        lblArrays[15] = lbl16;
+        lblArrays[16] = lbl17;
+        lblArrays[17] = lbl18;
+        lblArrays[18] = lbl19;
+        lblArrays[19] = lbl20;
+        lblArrays[20] = lbl21;
+        lblArrays[21] = lbl22;
+        lblArrays[22] = lbl23;
+        lblArrays[23] = lbl24;
+    }
+
+}

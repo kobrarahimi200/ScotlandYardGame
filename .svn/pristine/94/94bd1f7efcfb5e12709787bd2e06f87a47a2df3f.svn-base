@@ -1,0 +1,39 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package logic;
+
+/**
+ *
+ * @author Reyhan
+ */
+public interface GUIConnector {
+   /// public void displaySymbol(Position coord, int idPlayer, int quadX, int quadY);
+    public void clear();
+    public void showCurrentPlayer(int player);
+
+    public void showInDropDownList(Game game, boolean[] listOfTicket, Position pos,boolean blackTicket);
+
+    public void displaySymbol(Position currPosition, int idxCurrPlayer ,boolean is);
+    
+    public void updateLabelTicketsNum(int[] numOfTickets);
+     public void gameWon(String winnerName, int idPlayer);
+     /**
+      * display the mister x tickets 
+      * @param ticket 
+      */
+     public void showMisterXTicket(String ticket);
+     /**
+      * show error messages in the gui
+      * @param x 
+      */
+      public void showMsg(int x);
+      /**
+       * disable the blackTicket check box when the current player is detective
+       * @param isDisable 
+       */
+      public void disableBlackTicketCheckBox(boolean isDisable);
+  
+}

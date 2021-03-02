@@ -1,0 +1,125 @@
+/**
+ * JSON Schema is a declarative language for validating the format and structure
+ * of a JSON Object. It allows us to specify the number of special primitives to
+ * describe exactly what a valid JSON Object will look like.
+ */
+package logic;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+/**
+ *
+ * @author ite102770
+ */
+public class JsonValidation {
+
+    private int errorNumber = 0;
+    JSONArray stations = null;
+    JSONObject jsonObj = null;
+    JSONObject keys = null;
+
+    public JsonValidation(Object jsonMap) throws JSONException {
+        validate(jsonMap);
+    }
+    
+  public JsonValidation(String loadFile) throws JSONException {
+        
+    }
+
+    int getErrorNumber() {
+        return this.errorNumber;
+    }
+
+    private int validate(Object jsonMap) throws JSONException {
+        assert jsonMap != null;
+        boolean isValidate = false;
+        jsonObj = new JSONObject(jsonMap.toString());
+//        if(jsonObj.equals(" ")){
+//            errorNumber = 16;
+//        }
+        if (!jsonObj.has("stations")) {
+            errorNumber = 1;
+        }
+        if (errorNumber == 0) {
+            errorNumber = stationHasKey();
+        }
+        if (errorNumber == 0) {
+            errorNumber = checkKeysValidation();
+        }
+        return errorNumber;
+    }
+
+    private int stationHasKey() throws JSONException {
+        stations = jsonObj.getJSONArray("stations");
+        for (int i = 0; i < stations.length(); i++) {
+            keys = stations.getJSONObject(i);
+            if (!keys.has("identifier")) {
+                errorNumber = 2;
+            } else if (!keys.has("position")) {
+                errorNumber = 3;
+            } else if (!keys.has("tube")) {
+                errorNumber = 4;
+            } else if (!keys.has("bus")) {
+                errorNumber = 5;
+            } else if (!keys.has("boat")) {
+                errorNumber = 6;
+            } else if (!keys.optJSONObject("position").has("x") || !keys.optJSONObject("position").has("y")) {
+                errorNumber = 7;
+            }
+        }
+        if (stations.length() != 199) {
+            errorNumber = 8;
+        }
+        return errorNumber;
+    }
+
+    private int checkKeysValidation() throws JSONException {
+        System.out.println("inside checkIdentifier");
+        for (int i = 0; i < stations.length(); i++) {
+            keys = stations.getJSONObject(i);
+            if (keys.has("identifier")) {
+                if (keys.getInt("identifier") <= 0 || keys.getInt("identifier") >= 200) {
+                    errorNumber = 9;
+                }
+            }
+            if (keys.optJSONObject("position").has("x") && keys.optJSONObject("position").has("y")) {
+
+                if (keys.optJSONObject("position").getDouble("x") < 0.0
+                        || keys.optJSONObject("position").getDouble("x") >= 1.0) {
+                    errorNumber = 10;
+                }
+                if (keys.optJSONObject("position").getDouble("y") < 0.0
+                        || keys.optJSONObject("position").getDouble("y") > 1.0 && errorNumber == 0) {
+                    errorNumber = 11;
+                }
+            }
+            if (keys.has("tube")) {
+                if (keys.optJSONArray("tube").length() < 0 || keys.optJSONArray("tube").length() > 14) {
+                    errorNumber = 12;
+                }
+            }
+            if (keys.has("bus")) {
+                if (keys.optJSONArray("bus").length() < 0 || keys.optJSONArray("bus").length() > 14) {
+                    errorNumber = 13;
+                }
+            }
+            if (keys.has("cab")) {
+                if (keys.optJSONArray("cab").length() < 0 || keys.optJSONArray("cab").length() > 14) {
+                    errorNumber = 14;
+                }
+            }
+            if (keys.has("boat")) {
+                if (keys.optJSONArray("boat").length() < 0 || keys.optJSONArray("boat").length() > 14) {
+                    errorNumber = 15;
+                }
+            }
+        }
+        return errorNumber;
+    }
+    private int loadFileValidation(String file){
+        return 0;
+    }
+   
+}

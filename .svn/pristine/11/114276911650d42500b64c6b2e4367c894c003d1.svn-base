@@ -1,0 +1,42 @@
+/**
+ * JSON Schema is a declarative language for validating the format and structure 
+ * of a JSON Object. It allows us to specify the number of special primitives to
+ * describe exactly what a valid JSON Object will look like.
+ */
+package logic;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.jsonschema.JsonSchema;
+import static java.lang.Math.log;
+import static java.lang.StrictMath.log;
+import static java.rmi.server.LogStream.log;
+import java.util.Map;
+import javax.xml.validation.Schema;
+import static jdk.nashorn.tools.ShellFunctions.input;
+import org.json.JSONObject;
+
+/**
+ *
+ * @author ite102770
+ */
+public class JsonValidation {
+ @SneakyThrows
+private boolean validate(Map<String, Object> data, String jsonSchema) {
+
+    String stringData = objectMapper.writeValueAsString(data);
+    log.debug("Validation data. map: {}, jsonData: {}", data, stringData);
+
+    JsonNode schemaNode = JsonLoader.fromString(jsonSchema);
+
+    JsonNode dataNode = JsonLoader.fromString(stringData);
+    JsonSchemaFactory factory = JsonSchemaFactory.byDefault();
+    JsonSchema schema = factory.getJsonSchema(schemaNode);
+    val report = schema.validate(dataNode);
+
+    boolean isSuccess = report.isSuccess();
+    if (!isSuccess) {
+        log.info("Validation data report: {}", report.toString().replaceAll("\n", " | "));
+    }
+    return isSuccess;
+}
+}

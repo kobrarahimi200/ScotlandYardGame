@@ -1,0 +1,29 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package logic;
+
+/**
+ *
+ * @author Reyhan
+ */
+public class MisterX extends Player{
+    int numOfTurns;
+    public MisterX(int id, playerType type, boolean isAI, int numOfTaxis, 
+            int numOfBuses, int numOfBoats, int numOfTrains) {
+        super(id, type, isAI, numOfTaxis, numOfBuses, numOfBoats, numOfTrains);
+          this.numOfTurns =0;
+    }
+    @Override
+    protected int getnumOfTurns(){
+        return numOfTurns;
+    }
+    
+    @Override
+    protected void incNumOfTurns(){
+        numOfTurns++;
+    }
+    
+}

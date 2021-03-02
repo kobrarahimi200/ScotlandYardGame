@@ -1,0 +1,44 @@
+
+package logic;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ *
+ * @author Reyhan
+ */
+public class MisterX extends Player{
+    int numOfTurns;
+    private int lastShowPos;
+    private List<Integer> journeyBoard; // store all used ticket
+    public MisterX(int id, playerType type, boolean isAI, int numOfTaxis, 
+            int numOfBuses, int numOfBoats, int numOfTrains) {
+        super(id, type, isAI, numOfTaxis, numOfBuses, numOfBoats, numOfTrains);
+          this.numOfTurns =0;
+          lastShowPos =0;
+          journeyBoard = new ArrayList<>();
+    }
+      @Override
+    protected List<Integer> getJournyList(){
+        return journeyBoard;
+    }
+    
+    @Override
+    protected int getnumOfTurns(){
+        return numOfTurns;
+    }
+    
+    @Override
+    protected void incNumOfTurns(){
+        numOfTurns++;
+    }
+    @Override
+    protected int lastShownPos(){
+        return lastShowPos;
+    }
+    @Override
+    protected void addToJourneyList(Tickets ticket){
+        journeyBoard.add(Tickets.valueOf(ticket.toString()).ordinal());
+    }
+}

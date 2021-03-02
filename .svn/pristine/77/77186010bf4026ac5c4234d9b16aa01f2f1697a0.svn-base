@@ -1,0 +1,36 @@
+package logic;
+
+/**
+ *
+ * @author Reyhan
+ */
+public class Choose {
+
+    private Tickets t;
+    private Station s;
+    private double w;
+
+    public Choose(Tickets ticket, Station s) {
+        this.t = ticket;
+        this.s = s;
+    }
+
+    public Choose(Tickets ticket, Station s, double weight) {
+        this.t = ticket;
+        this.s = s;
+        this.w = weight;
+    }
+
+    public Tickets getTicket() {
+        return t;
+    }
+
+    public Station getStation() {
+        return s;
+    }
+
+    protected double getWeight() {
+        return this.w;
+    }
+
+}

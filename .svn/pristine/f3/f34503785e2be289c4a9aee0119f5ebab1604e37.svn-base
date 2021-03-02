@@ -1,0 +1,10 @@
+
+package logic;
+
+/**
+ * this class is used for validating the format of loaded file
+ * @author ite102770
+ */
+public class LoadValidation {
+    
+}

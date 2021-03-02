@@ -1,0 +1,38 @@
+/**
+ * JSON Schema is a declarative language for validating the format and structure
+ * of a JSON Object. It allows us to specify the number of special primitives to
+ * describe exactly what a valid JSON Object will look like.
+ */
+package logic;
+
+import java.io.FileReader;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+/**
+ *
+ * @author ite102770
+ */
+public class JsonValidation {
+
+    private int errorNumber = 0;
+
+    private boolean validate(Object objectJson) throws JSONException {
+        boolean isValidate = false;
+
+        JSONArray jarray = null;
+        JSONObject jo2 = new JSONObject(objectJson.toString());
+        jarray = jo2.getJSONArray("stations");
+        if (jarray == null) {
+            errorNumber = 1;
+        } else {
+            for (int i = 0; i < jarray.length(); i++) {
+                JSONObject pos = jarray.getJSONObject(i);
+            }
+        }
+
+        return isValidate;
+
+    }
+}

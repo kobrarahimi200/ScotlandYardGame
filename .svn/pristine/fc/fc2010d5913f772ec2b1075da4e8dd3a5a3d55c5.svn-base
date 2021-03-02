@@ -1,0 +1,101 @@
+package logic;
+
+import java.util.List;
+
+/**
+ *
+ * @author Reyhan
+ */
+public class SaveObj {
+
+    private boolean misterXAI;
+    private boolean detectiveAI;
+    private boolean isWon;
+    int CurrRoundNo;
+    int whosTurn;//current player id
+    int lastShownPos;//last shown position of mister x 
+    int[] possibleTargets;
+    int[] remainingTickets;
+    List<Integer> journeyBoard;//used ticket number 
+    int currPosOfMisterX;
+    int numOfDetectives;
+    int[] detectivesPos;
+    int[][] remainingTicketDetec;
+    Player[] players;
+
+    SaveObj(Player[] player, int idxPlayer, int numOfDetectives, boolean isWon) {
+        misterXAI = player[0].isAI();
+        //possibleTargets = player[0].
+        lastShownPos = player[0].lastShownPos();
+        remainingTickets = player[0].getAllTickets();
+        whosTurn = idxPlayer;
+        journeyBoard = player[0].getJournyList();
+        detectiveAI = player[1].isAI();
+        currPosOfMisterX = player[0].getCurrStation();
+        players = player;
+        for (int i = 1; i < player.length; i++) {
+            detectivesPos[i] = player[i].getCurrStation();
+        }
+        for (int i = 1; i < player.length; i++) {
+            remainingTicketDetec[i] = player[i].getAllTickets();
+        }
+        this.isWon = isWon;
+    }
+
+    public int getCurrPosOfMisterX() {
+        return currPosOfMisterX;
+    }
+
+    public Player[] getPlayers() {
+        return players;
+    }
+
+    public boolean isMisterXAI() {
+        return misterXAI;
+    }
+
+    public boolean isDetectiveAI() {
+        return detectiveAI;
+    }
+
+    public boolean isIsWon() {
+        return isWon;
+    }
+
+    public int getCurrRoundNo() {
+        return CurrRoundNo;
+    }
+
+    public int getWhosTurn() {
+        return whosTurn;
+    }
+
+    public int getLastShownPos() {
+        return lastShownPos;
+    }
+
+    public int[] getPossibleTargets() {
+        return possibleTargets;
+    }
+
+    public int[] getRemainingTickets() {
+        return remainingTickets;
+    }
+
+    public List<Integer> getJourneyBoard() {
+        return journeyBoard;
+    }
+
+    public int getNumOfDetectives() {
+        return numOfDetectives;
+    }
+
+    public int[] getDetectivesPos() {
+        return detectivesPos;
+    }
+
+    public int[][] getRemainingTicketDetec() {
+        return remainingTicketDetec;
+    }
+
+}

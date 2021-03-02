@@ -1,0 +1,21 @@
+
+package logic;
+
+/**
+ *
+ * @author Reyhan
+ */
+public class JsonStation {
+
+    private Stations[] stations;
+
+    public void setS(Stations[] s) {
+        this.stations = s;
+    }
+
+    public Stations[] getStations() {
+        return stations;
+    }
+   
+    
+}

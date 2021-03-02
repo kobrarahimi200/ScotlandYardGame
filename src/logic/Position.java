@@ -1,0 +1,78 @@
+package logic;
+
+/**
+ * the position for the station
+ *
+ * @author Reyhan
+ */
+public class Position {
+
+    private final double x;
+    private final double y;
+
+    /**
+     * default constructor
+     *
+     * @param x
+     * @param y
+     */
+    public Position(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    /**
+     * returns the x position of board
+     *
+     * @return
+     */
+    public double x() {
+        return x;
+    }
+
+    /**
+     * returns the y position of board
+     *
+     * @return
+     */
+    public double y() {
+        return y;
+    }
+
+    /**
+     * two positions are equal if the x-values and y-values are equal
+     *
+     * @param obj
+     * @return true, if the x-values and y-values are equal
+     */
+    @Override
+    public boolean equals(Object obj) {
+        return obj != null
+                && obj.getClass() == this.getClass()
+                && ((Position) obj).x == this.x
+                && ((Position) obj).y == this.y;
+    }
+
+    /**
+     * x/y
+     *
+     * @return x/y
+     */
+    @Override
+    public String toString() {
+        return x + "/" + y;
+    }
+
+    /**
+     * checks if this position is next to given position.
+     *
+     * @param p position to be near to
+     * @return if this position is next to given position
+     */
+    public boolean isNextTo(Position p) {
+        double xDiff = Math.abs(x - p.x());
+        double yDiff = Math.abs(y - p.y());
+        return (xDiff == 1 && yDiff == 0
+                || xDiff == 0 && yDiff == 1);
+    }
+}

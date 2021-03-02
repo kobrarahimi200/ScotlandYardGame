@@ -1,0 +1,291 @@
+package logic;
+
+import java.util.LinkedList;
+import java.util.List;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+/**
+ *
+ * @author kobra
+ */
+public class Board {
+
+    Stations[] map;
+    private final IO io;
+    private final List<Station> stations;
+    private final int numOfStations;
+
+    /**
+     * default constructor
+     *
+     * @throws JSONException
+     */
+    Board() throws JSONException {
+        io = new IO();
+        assert (io.getJsonValues() != null);
+        this.map = io.getJsonValues();
+        stations = new LinkedList<>();
+        convertToArray();
+        numOfStations = map.length;
+
+    }
+
+    /**
+     * return the map
+     *
+     * @return
+     */
+    Stations[] getMap() {
+        return this.map;
+    }
+
+    List<Station> getAllStations() {
+        return this.stations;
+    }
+
+    Station getStation(int identifier) {
+        assert (identifier >= 1 && identifier <= 199) : "wrong identifier is provided.";
+        return this.stations.get(identifier - 1);
+    }
+
+    /**
+     * get the position of the given index
+     *
+     * @param i
+     * @return
+     * @throws JSONException
+     */
+    Position getCoordinate(int i) throws JSONException {
+//        JSONObject jsonObject1 = map[i].getPosition();
+//        double jsonObjectX = (double) jsonObject1.get("x");
+//        double jsonObjectY = (double) jsonObject1.get("y");
+        //Position pos = new Position(map[i].getPosition().x(), map[i].getPosition().y());
+        return new Position(map[i].getPosition().x(), map[i].getPosition().y());
+    }
+
+    /**
+     * get the position of the given index
+     *
+     * @param i
+     * @return
+     * @throws JSONException
+     */
+    int getIdentifier(Position pos) throws JSONException {
+        Position[] posAll = getAllPositions();
+        int id = 0;
+        for (int i = 0; i < posAll.length; i++) {
+            if (posAll[i].equals(pos)) {
+                id = i;
+            }
+        }
+        return id + 1;
+    }
+
+    /**
+     * convert the json file to linked list
+     *
+     * @return @throws JSONException
+     */
+    void convertToArray() throws JSONException {
+        if (map != null) {
+            int len = map.length;
+            //System.out.println("length " + len);
+            for (int i = 0; i < 199; i++) {
+                stations.add(new Station(i + 1));
+            }
+            for (int i = 0; i < 199; i++) {
+                getEachElementFromJson(i);
+            }
+        }
+    }
+
+    /**
+     * gets one json object and convert it into mapJson object
+     *
+     * @param i
+     * @return
+     * @throws JSONException
+     */
+    void getEachElementFromJson(int i) throws JSONException {
+        int[] tube2 = map[i].getTube();
+        int[] bus2 = map[i].getBus();
+        int[] cab2 = map[i].getCab();
+        int[] boat2 = map[i].getBoat();
+        Position pos = getCoordinate(i);
+        stations.get(i).setPosition(pos);
+        stations.get(i).setTube(intToStation(tube2));
+        stations.get(i).setBus(intToStation(bus2));
+        stations.get(i).setCab(intToStation(cab2));
+        stations.get(i).setBoat(intToStation(boat2));
+
+    }
+
+    private int[] ObjectToInt(JSONArray jsonArray) throws JSONException {
+        int[] temp = new int[jsonArray.length()];
+        for (int i = 0; i < temp.length; i++) {
+            temp[i] = jsonArray.getInt(i);
+
+        }
+        return temp;
+    }
+
+    private Station[] intToStation(int[] temp) {
+        Station[] s = new Station[temp.length];
+        for (int i = 0; i < s.length; i++) {
+            s[i] = stations.get(temp[i] - 1);
+
+        }
+        return s;
+    }
+
+    /**
+     * returns all positions
+     *
+     * @return
+     * @throws JSONException
+     */
+    Position[] getAllPositions() throws JSONException {
+        Position[] positions = new Position[numOfStations];
+        for (int i = 0; i < numOfStations; i++) {
+            positions[i] = getCoordinate(i);
+        }
+        return positions;
+    }
+
+    /**
+     * calculate the valid position for the given position according to
+     * Euclidean distance formula.
+     *
+     * @param pos
+     * @return
+     * @throws JSONException
+     */
+    Position calcValidStation(Position pos) throws JSONException {
+        float x;
+        float y;
+        float distance = 0;
+        Position temp = new Position(0, 0);
+        for (int i = 0; i < getAllPositions().length; i++) {
+            y = (float) Math.abs(getAllPositions()[i].y() - pos.y());
+            x = (float) Math.abs(getAllPositions()[i].x() - pos.x());
+            distance = (float) Math.sqrt((y * y) + (x * x));
+            if (distance <= 0.009) {
+                temp = getAllPositions()[i];
+                break;
+            }
+        }
+        return temp;
+    }
+
+    /**
+     *
+     * @param station
+     * @return
+     */
+    boolean hasEnoughTicket(int station) {
+        boolean hasEnough = false;
+        if (stations.get(station + 1).getTrainNeighbors().length > 0) {
+            hasEnough = true;
+        } else if (stations.get(station + 1).getBusNeighbors().length > 0) {
+            hasEnough = true;
+        } else if (stations.get(station + 1).getTaxiNeighbors().length > 0) {
+            hasEnough = true;
+        } else if (stations.get(station + 1).getBoatNeighbors().length > 0) {
+            hasEnough = true;
+        }
+        return hasEnough;
+    }
+
+    /**
+     * checks if current player in the given identifier(current station) has
+     * enough tickets.
+     *
+     * @param idx
+     * @param pl
+     * @return
+     */
+    boolean canPlay(int idx, Player pl) {
+        boolean isPlay = false;
+        isPlay = (stations.get(idx - 1).getTaxiNeighbors().length > 0 && pl.getNumOfTaxis() > 0) || isPlay;
+        isPlay = (stations.get(idx - 1).getBusNeighbors().length > 0 && pl.getNumOfBuses() > 0) || isPlay;
+        isPlay = (stations.get(idx - 1).getTrainNeighbors().length > 0 && pl.getNumOfTrains() > 0) || isPlay;
+        isPlay = (stations.get(idx - 1).getBoatNeighbors().length > 0 && pl.getNumOfBoats() > 0) || isPlay;
+        return isPlay;
+    }
+
+    /**
+     * checks if current player has enough ticket to go to the clicked station.
+     *
+     * @param clickedPosID
+     * @param currStation
+     * @param pl
+     * @return
+     */
+    boolean[] checkIfNeihbor(int clickedPosID, int currStation, Player pl) {
+        //Position[] pos = null;
+        boolean[] neighbors = new boolean[4];
+        neighbors[0] = hasTrainNeighbor(clickedPosID, currStation) && pl.getNumOfTrains() > 0;
+        neighbors[1] = hasBusNeighbor(clickedPosID, currStation) && pl.getNumOfBuses() > 0;
+        neighbors[2] = hasTaxiNeighbor(clickedPosID, currStation) && pl.getNumOfTaxis() > 0;
+        neighbors[3] = hasBoatNeighbor(clickedPosID, currStation) && pl.getNumOfBoats() > 0;
+        return neighbors;
+    }
+
+    /**
+     * return true if current station is the neighbor of the given station
+     *
+     * @param identifier
+     * @param currStation
+     * @return
+     */
+    protected boolean isNeighbor(int identifier, int currStation) {
+        return stations.get(currStation - 1).isNeihbor(identifier);
+    }
+
+    /**
+     * checks if the current station has the bus neighbor, then return true
+     *
+     * @param clickedPosID
+     * @param currStation
+     * @return
+     */
+    protected boolean hasBusNeighbor(int clickedPosID, int currStation) {
+        return stations.get(currStation - 1).hasBusNeighbor(clickedPosID);
+
+    }
+
+    /**
+     * checks if the current station has the bus neighbor, then return true
+     *
+     * @param clickedPosID
+     * @param currStation
+     * @return
+     */
+    protected boolean hasTaxiNeighbor(int clickedPosID, int currStation) {
+        return stations.get(currStation - 1).hasTaxiNeighbor(clickedPosID);
+    }
+
+    /**
+     * checks if the current station has the bus neighbor, then return true
+     *
+     * @param clickedPosID
+     * @param currStation
+     * @return
+     */
+    protected boolean hasTrainNeighbor(int clickedPosID, int currStation) {
+        return stations.get(currStation - 1).hasTrainNeighbor(clickedPosID);
+    }
+
+    /**
+     * checks if the current station has the bus neighbor, then return true
+     *
+     * @param clickedPosID
+     * @param currStation
+     * @return
+     */
+    protected boolean hasBoatNeighbor(int clickedPosID, int currStation) {
+        return stations.get(currStation - 1).hasBoatNeighbor(clickedPosID);
+    }
+}

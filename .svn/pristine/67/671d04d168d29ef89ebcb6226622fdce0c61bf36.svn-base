@@ -1,0 +1,186 @@
+package logic;
+
+/**
+ * this class is responsible for setting the save object attributes and also
+ * getting the loaded file.
+ *
+ * @author Reyhan
+ */
+public class JsonSaveLoad {
+
+    private SaveLoadMisterX misterX;
+    private SaveLoadDetective detectives;
+    private int whosTurn;
+    private int currRoundNo;
+    private boolean gameIsWon;
+
+    public SaveLoadMisterX getMisterX() {
+        return misterX;
+    }
+
+    public void setMisterX(SaveLoadMisterX misterX) {
+        this.misterX = misterX;
+    }
+
+    public SaveLoadDetective getDetectives() {
+        return detectives;
+    }
+
+    public void setDetectives(SaveLoadDetective detectives) {
+        this.detectives = detectives;
+    }
+
+    public int getWhosTurn() {
+        return whosTurn;
+    }
+
+    public void setWhosTurn(int whosTurn) {
+        this.whosTurn = whosTurn;
+    }
+
+    public int getCurrRoundNo() {
+        return currRoundNo;
+    }
+
+    public void setCurrRoundNo(int currRoundNo) {
+        this.currRoundNo = currRoundNo;
+    }
+
+    public boolean isGameIsWon() {
+        return gameIsWon;
+    }
+
+    public void setGameIsWon(boolean gameIsWon) {
+        this.gameIsWon = gameIsWon;
+    }
+
+    /**
+     * create an object for save and load for mister x with given attributes
+     */
+    public static class SaveLoadMisterX {
+
+        private boolean ai;
+        private int[] possibleTargets;
+        private int lastShownPos;
+        private int currPos;
+        private int[] remainingTickets;
+        private int[] journeyBoard;
+
+        public boolean isAI() {
+            return ai;
+        }
+
+        public void setAI(boolean ai) {
+            this.ai = ai;
+        }
+
+        public int[] getPossibleTargets() {
+            return possibleTargets;
+        }
+
+        public void setPossibleTargets(int[] possibleTargets) {
+            this.possibleTargets = possibleTargets;
+        }
+
+        public int getLastShownPos() {
+            return lastShownPos;
+        }
+
+        public void setLastShownPos(int lastShownPos) {
+            this.lastShownPos = lastShownPos;
+        }
+
+        public int getCurrPos() {
+            return currPos;
+        }
+
+        public void setCurrPos(int currPos) {
+            this.currPos = currPos;
+        }
+
+        public int[] getRemainingTickets() {
+            return remainingTickets;
+        }
+
+        public void setRemainingTickets(int[] remainingTickets) {
+            this.remainingTickets = remainingTickets;
+        }
+
+        public int[] getJourneyBoard() {
+            return journeyBoard;
+        }
+
+        public void setJourneyBoard(int[] journeyBoard) {
+            this.journeyBoard = journeyBoard;
+        }
+
+        public SaveLoadMisterX() {
+        }
+    }
+
+    /**
+     * create an object for detectives with the given attributes
+     */
+    public static class SaveLoadDetective {
+
+        private int noOfDetectives;
+        private boolean ai;
+        private SLDetectives players[];
+
+        public SaveLoadDetective() {
+        }
+
+        public int getNoOfDetectives() {
+            return noOfDetectives;
+        }
+
+        public void setNoOfDetectives(int noOfDetectives) {
+            this.noOfDetectives = noOfDetectives;
+        }
+
+        public boolean isAi() {
+            return ai;
+        }
+
+        public void setAi(boolean ai) {
+            this.ai = ai;
+        }
+
+        public SLDetectives[] getPlayers() {
+            return players;
+        }
+
+        public void setPlayers(SLDetectives[] players) {
+            this.players = players;
+        }
+
+    }
+
+    /**
+     * create an object for all detectives with the required attributes
+     */
+    public static class SLDetectives {
+
+        private int position;
+        private int remainingTickets[];
+  public SLDetectives() {
+        }
+        public int getPosition() {
+            return position;
+        }
+
+        public void setPosition(int position) {
+            this.position = position;
+        }
+
+        public int[] getRemainingTickets() {
+            return remainingTickets;
+        }
+
+        public void setRemainingTickets(int[] remainingTickets) {
+            this.remainingTickets = remainingTickets;
+        }
+
+      
+    }
+}

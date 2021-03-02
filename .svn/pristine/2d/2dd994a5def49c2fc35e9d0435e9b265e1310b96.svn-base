@@ -1,0 +1,19 @@
+
+package logic;
+
+/**
+ * this class is used for validating the format of loaded file
+ * @author ite102770
+ */
+public class LoadValidation {
+    private SaveObj misterX;
+
+    public SaveObj getSaveObj() {
+        return misterX;
+    }
+
+    public void setSaveObj(SaveObj saveObj) {
+        this.misterX = saveObj;
+    }
+    
+}

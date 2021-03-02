@@ -1,0 +1,54 @@
+package logic;
+import com.google.gson.Gson;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+
+public class IO {
+
+    String inPath = "C:\\Users\\Reyhan\\Desktop\\map.json";
+
+    public JSONArray getJsonValues () throws JSONException {
+        Gson gson = new Gson();
+         JSONArray jarray = null;
+        try (FileReader reader = new FileReader("net.json")) {
+            Object obj;
+            
+            obj = gson.fromJson(reader, Object.class);
+            
+            JSONObject jo2 = new JSONObject(obj.toString());
+           
+            //jarray = jo2.getJSONObject(obj.toString()).getJSONArray("stations");
+           jarray = jo2.getJSONArray("stations");
+            for (int i = 0; i < jarray.length(); i++) {
+                JSONObject pos = jarray.getJSONObject(i);
+               // Map2 m = jarray.get(i);
+                
+              // System.out.println(pos.get("position"));
+            }
+           
+        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
+        }
+        return jarray;
+    }
+
+    public static boolean isJSONValid(String test) {
+        try {
+            JSONObject jsonObject = new JSONObject(test);
+        } catch (JSONException ex) {
+            // edited, to include @Arthur's comment
+            // e.g. in case JSONArray is valid as well...
+            try {
+                JSONArray jsonArray = new JSONArray(test);
+            } catch (JSONException ex1) {
+                return false;
+            }
+        }
+        return true;
+    }
+}

@@ -1,0 +1,296 @@
+package logic;
+
+import java.util.LinkedList;
+import java.util.List;
+
+/**
+ * Each station in the board has these attributes, identifier of the station,
+ * position of each station, array of the stations which can be reached by tube
+ * ticket, array of the stations which can be reached by bus ticket, array of
+ * the stations which can be reached by cab ticket and the last array is for the
+ * boat ticket. There are some applicable method which is required for the game
+ * such as getAllneighbors, which checks the neighbor’s station of each station
+ * and store them into a list, hasTrainNeighbors checks if the current station
+ * has the train neighbor with clicked position.  *
+ * @author Reyhan
+ */
+public class Station {
+
+    private int identifier;
+    private Position position;
+    private Station[] tube;//train
+    private Station[] bus;
+    private Station[] cab;//taxi
+    private Station[] boat;
+    //String error;
+
+    public Station() {
+    }
+
+    Station(int idenfier) {
+        this.identifier = idenfier;
+    }
+
+    Station(int idenfier, Position pos, Station[] train, Station[] bus, Station[] taxi, Station[] boat) {
+        this.identifier = idenfier;
+    }
+
+    public void setPosition(Position position) {
+        this.position = position;
+    }
+
+    public void setCab(Station[] cab) {
+        this.cab = cab;
+    }
+
+    public void setBus(Station[] bus) {
+        this.bus = bus;
+    }
+
+    public void setTube(Station[] tube) {
+        this.tube = tube;
+    }
+
+    public void setBoat(Station[] boat) {
+        this.boat = boat;
+    }
+
+    int getIdentifier() {
+        return this.identifier;
+    }
+
+    Position getPos() {
+        return this.position;
+    }
+
+    public Station[] getTaxiNeighbors() {
+        return this.cab;
+    }
+
+    protected Station[] getBusNeighbors() {
+        return this.bus;
+    }
+
+    protected Station[] getBoatNeighbors() {
+        return this.boat;
+    }
+
+    protected Station[] getTrainNeighbors() {
+        return this.tube;
+    }
+
+    /**
+     * checks if the given station has enough ticket to move
+     *
+     * @param station
+     * @return true if it has enough ticket
+     */
+    boolean hasEnoughTicket(int station) {
+        boolean hasEnough = false;
+        if (this.getTrainNeighbors().length > 0) {
+            hasEnough = true;
+        } else if (this.getBusNeighbors().length > 0) {
+            hasEnough = true;
+        } else if (this.getTaxiNeighbors().length > 0) {
+            hasEnough = true;
+        } else if (this.getBoatNeighbors().length > 0) {
+            hasEnough = true;
+        }
+        return hasEnough;
+    }
+
+    /**
+     * checks if current player in the given identifier(current station) has
+     * enough tickets.
+     *
+     * @param idx
+     * @param pl
+     * @return
+     */
+    boolean canPlay(int idx, Player pl) {
+        boolean isPlay = false;
+        isPlay = (this.getTaxiNeighbors().length > 0 && pl.getNumOfTaxis() > 0) || isPlay;
+        isPlay = (this.getBusNeighbors().length > 0 && pl.getNumOfBuses() > 0) || isPlay;
+        isPlay = (this.getTrainNeighbors().length > 0 && pl.getNumOfTrains() > 0) || isPlay;
+        isPlay = (this.getBoatNeighbors().length > 0 && pl.getNumOfBoats() > 0) || isPlay;
+        return isPlay;
+    }
+
+    /**
+     * checks if current player has enough ticket to go to the clicked station.
+     *
+     * @param clickedPosID
+     * @param currStation
+     * @param pl
+     * @return
+     */
+    boolean[] checkIfNeihbor(int clickedPosID, Player pl) {
+        boolean[] neighbors = new boolean[4];
+        neighbors[0] = hasTrainNeighbor(clickedPosID) && pl.getNumOfTrains() > 0;
+        neighbors[1] = hasBusNeighbor(clickedPosID) && pl.getNumOfBuses() > 0;
+        neighbors[2] = hasTaxiNeighbor(clickedPosID) && pl.getNumOfTaxis() > 0;
+        neighbors[3] = hasBoatNeighbor(clickedPosID) && pl.getNumOfBoats() > 0;
+        return neighbors;
+    }
+
+    /**
+     * checks if current player is the neighbor with the given station id
+     *
+     * @param clickedPosID
+     * @param currStation
+     * @param pl
+     * @return
+     */
+    boolean[] HasMoreNeighbors(int id) {
+        boolean[] neighbors = new boolean[4];
+        neighbors[0] = hasTrainNeighbor(id);
+        neighbors[1] = hasBusNeighbor(id);
+        neighbors[2] = hasTaxiNeighbor(id);
+        neighbors[3] = hasBoatNeighbor(id);
+        return neighbors;
+    }
+
+    /**
+     * returns true if the given station id is the neighbor with a neigjbor
+     * which has enough ticket to go
+     *
+     * @param identifier
+     * @return
+     */
+    boolean isNeighbor(int identifier) {
+        boolean isNeihbor = false;
+        if (this.hasTrainNeighbor(identifier)) {
+            isNeihbor = true;
+        } else if (this.hasBoatNeighbor(identifier)) {
+            isNeihbor = true;
+        } else if (this.hasTaxiNeighbor(identifier)) {
+            isNeihbor = true;
+        } else if (this.hasBusNeighbor(identifier)) {
+            isNeihbor = true;
+        }
+        return isNeihbor;
+    }
+
+    /**
+     * checks if the current station has the bus neighbor, then return true
+     *
+     * @param clickedPosID
+     * @return
+     */
+    protected boolean hasBusNeighbor(int clickedPosID) {
+        boolean isNeighborBus = false;
+        for (int i = 0; i < this.getBusNeighbors().length && !isNeighborBus; i++) {
+            if (this.getBusNeighbors()[i].getIdentifier() == clickedPosID) {
+                isNeighborBus = true;
+            }
+        }
+        return isNeighborBus;
+    }
+
+    /**
+     * checks if the current station has the bus neighbor, then return true
+     *
+     * @param clickedPosID
+     * @return
+     */
+    protected boolean hasTaxiNeighbor(int clickedPosID) {
+        boolean isNeighborTaxi = false;
+
+        for (int i = 0; i < this.getTaxiNeighbors().length && !isNeighborTaxi; i++) {
+            if (this.getTaxiNeighbors()[i].getIdentifier() == clickedPosID) {
+                isNeighborTaxi = true;
+            }
+        }
+        return isNeighborTaxi;
+    }
+
+    /**
+     * checks if the current station has the train neighbor, then return true
+     *
+     * @param clickedPosID
+     * @return
+     */
+    protected boolean hasTrainNeighbor(int clickedPosID) {
+        boolean isNeighborTrain = false;
+        for (int i = 0; i < this.getTrainNeighbors().length && !isNeighborTrain; i++) {
+            if (this.getTrainNeighbors()[i].getIdentifier() == clickedPosID) {
+                isNeighborTrain = true;
+            }
+        }
+        return isNeighborTrain;
+    }
+
+    /**
+     * checks if the current station has the bus neighbor, then return true
+     *
+     * @param clickedPosID
+     * @return
+     */
+    protected boolean hasBoatNeighbor(int clickedPosID) {
+        boolean isNeighborBoat = false;
+        for (int i = 0; i < this.getBoatNeighbors().length && !isNeighborBoat; i++) {
+            if (this.getBoatNeighbors()[i].getIdentifier() == clickedPosID) {
+                isNeighborBoat = true;
+            }
+        }
+        return isNeighborBoat;
+    }
+
+    /**
+     * gets all neighbors for every station and store each neighbor according to
+     * the means of transport
+     *
+     * @return
+     */
+    protected List<Station> getAllNeighbors() {
+        List<Station> all = new LinkedList<>();
+        for (Station tube1 : tube) {
+            if (!all.contains(tube1)) {
+                all.add(tube1);
+            }
+        }
+        for (Station bus1 : bus) {
+            if (!all.contains(bus1)) {
+                all.add(bus1);
+            }
+        }
+        for (Station cab1 : cab) {
+            if (!all.contains(cab1)) {
+                all.add(cab1);
+            }
+        }
+        for (Station boat1 : boat) {
+            if (!all.contains(boat1)) {
+                all.add(boat1);
+            }
+        }
+        return all;
+    }
+
+    /**
+     * gets the station with type
+     *
+     * @return anarray of station
+     */
+    Station[][] getStationByType() {
+        return new Station[][]{tube, bus, cab, boat};
+    }
+
+    @Override
+    public String toString() {
+        return "id: " + this.getIdentifier() + ", Taxi: " + taxiNeighbors();
+    }
+
+    /**
+     * returns a string of the taxi neighbors id.
+     *
+     * @return
+     */
+    private String taxiNeighbors() {
+        String s = "";
+        for (Station taxiNeighbor : getTaxiNeighbors()) {
+            s = s + ", " + taxiNeighbor.getIdentifier();
+        }
+        return s;
+    }
+}

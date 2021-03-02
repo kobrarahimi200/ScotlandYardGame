@@ -1,0 +1,10 @@
+
+package logic;
+
+/**
+ *
+ * @author Reyhan
+ */
+public enum playerType {
+    MISTERX, BLUE, YELLOW, RED,GREEN, BLACK;
+}

@@ -1,0 +1,220 @@
+/**
+ * JSON Schema is a declarative language for validating the format and structure
+ * of a JSON Object. It allows us to specify the number of special primitives to
+ * describe exactly what a valid JSON Object will look like.
+ */
+package logic;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+/**
+ *
+ * @author ite102770
+ */
+public class JsonValidation {
+
+    private int errorNumber = 0;
+    JSONArray stations = null;
+    JSONObject jsonObj = null;
+    JSONObject keys = null;
+    private int errorLoadNum = 0;
+
+    public JsonValidation(Object jsonMap) throws JSONException {
+        validate(jsonMap);
+    }
+
+    public JsonValidation(JSONObject loadFile) throws JSONException {
+        if (errorLoadNum == 0) {
+            loadFileValidation(loadFile);
+        }
+        if (errorLoadNum == 0) {
+            checkMisterXKeys(loadFile);
+        }
+    }
+
+    int getErrorNumber() {
+        return this.errorNumber;
+    }
+
+    int getErrorLoadNumber() {
+        return this.errorLoadNum;
+    }
+
+    private int validate(Object jsonMap) throws JSONException {
+        assert jsonMap != null;
+        boolean isValidate = false;
+        jsonObj = new JSONObject(jsonMap.toString());
+//        if(jsonObj.equals(" ")){
+//            errorNumber = 16;
+//        }
+        if (!jsonObj.has("stations")) {
+            errorNumber = 1;
+        }
+        if (errorNumber == 0) {
+            errorNumber = stationHasKey();
+        }
+        if (errorNumber == 0) {
+            errorNumber = checkKeysValidation();
+        }
+        return errorNumber;
+    }
+
+    private int stationHasKey() throws JSONException {
+        stations = jsonObj.getJSONArray("stations");
+        for (int i = 0; i < stations.length(); i++) {
+            keys = stations.getJSONObject(i);
+            if (!keys.has("identifier")) {
+                errorNumber = 2;
+            } else if (!keys.has("position")) {
+                errorNumber = 3;
+            } else if (!keys.has("tube")) {
+                errorNumber = 4;
+            } else if (!keys.has("bus")) {
+                errorNumber = 5;
+            } else if (!keys.has("boat")) {
+                errorNumber = 6;
+            } else if (!keys.optJSONObject("position").has("x") || !keys.optJSONObject("position").has("y")) {
+                errorNumber = 7;
+            }
+        }
+        if (stations.length() != 199) {
+            errorNumber = 8;
+        }
+        return errorNumber;
+    }
+
+    private int checkKeysValidation() throws JSONException {
+        System.out.println("inside checkIdentifier");
+        for (int i = 0; i < stations.length(); i++) {
+            keys = stations.getJSONObject(i);
+            if (keys.has("identifier")) {
+                if (keys.getInt("identifier") <= 0 || keys.getInt("identifier") >= 200) {
+                    errorNumber = 9;
+                }
+            }
+            if (keys.optJSONObject("position").has("x") && keys.optJSONObject("position").has("y")) {
+
+                if (keys.optJSONObject("position").getDouble("x") < 0.0
+                        || keys.optJSONObject("position").getDouble("x") >= 1.0) {
+                    errorNumber = 10;
+                }
+                if (keys.optJSONObject("position").getDouble("y") < 0.0
+                        || keys.optJSONObject("position").getDouble("y") > 1.0 && errorNumber == 0) {
+                    errorNumber = 11;
+                }
+            }
+            if (keys.has("tube")) {
+                if (keys.optJSONArray("tube").length() < 0 || keys.optJSONArray("tube").length() > 14) {
+                    errorNumber = 12;
+                }
+            }
+            if (keys.has("bus")) {
+                if (keys.optJSONArray("bus").length() < 0 || keys.optJSONArray("bus").length() > 14) {
+                    errorNumber = 13;
+                }
+            }
+            if (keys.has("cab")) {
+                if (keys.optJSONArray("cab").length() < 0 || keys.optJSONArray("cab").length() > 14) {
+                    errorNumber = 14;
+                }
+            }
+            if (keys.has("boat")) {
+                if (keys.optJSONArray("boat").length() < 0 || keys.optJSONArray("boat").length() > 14) {
+                    errorNumber = 15;
+                }
+            }
+        }
+        return errorNumber;
+    }
+
+    private int loadFileValidation(JSONObject json) {
+        if (!json.has("misterX")) {
+            errorLoadNum = 1;
+        } else if (!json.has("detectives")) {
+            errorLoadNum = 2;
+        } else if (!json.has("whoseTurn")) {
+            errorLoadNum = 3;
+        } else if (!json.has("currRoundNo")) {
+            errorLoadNum = 4;
+        } else if (!json.has("gameIsWon")) {
+            errorLoadNum = 5;
+        }
+        return errorLoadNum;
+    }
+
+    private int checkMisterXKeys(JSONObject json) throws JSONException {
+        JSONObject misterX = json.getJSONObject("misterX");
+        if (!misterX.has("ai")) {
+            errorLoadNum = 6;
+        } else if (!misterX.has("possibleTargets")) {
+            errorLoadNum = 7;
+        } else if (!misterX.has("lastShownPos")) {
+            errorLoadNum = 8;
+        } else if (!misterX.has("currPos")) {
+            errorLoadNum = 9;
+        } else if (!misterX.has("remainingTickets")) {
+            errorLoadNum = 10;
+        } else if (!misterX.has("journeyBoard")) {
+            errorLoadNum = 11;
+        }
+        return errorLoadNum;
+    }
+
+    private int checkArraysLength(JSONObject json) throws JSONException {
+        JSONObject misterX = json.getJSONObject("misterX");
+        if (misterX.has("possibleTargets")) {
+            if (misterX.getJSONArray("possibleTargets").length() < 0) {
+                errorLoadNum = 12;
+            }
+        }
+        for (int i = 0; i < misterX.getJSONArray("possibleTargets").length(); i++) {
+            Object key = misterX.getJSONArray("possibleTargets").get(i);
+            if (misterX.has("possibleTargets")) {
+                if (!(key instanceof Integer)) {
+                    errorLoadNum = 13;
+                }
+            }
+
+        }
+        for (int i = 0; i < misterX.getJSONArray("remainingTickets").length(); i++) {
+            Object key = misterX.getJSONArray("remainingTickets").get(i);
+            if (misterX.has("remainingTickets")) {
+                if (!(key instanceof Integer)) {
+                    errorLoadNum = 14;
+                }
+            }
+
+        }
+        for (int i = 0; i < misterX.getJSONArray("journeyBoard").length(); i++) {
+            Object key = misterX.getJSONArray("journeyBoard").get(i);
+            if (misterX.has("journeyBoard")) {
+                if (!(key instanceof Integer)) {
+                    errorLoadNum = 15;
+                }
+            }
+
+        }
+        return errorLoadNum;
+    }
+    private int checkTypeOfKeys(JSONObject json) throws JSONException{
+         JSONObject misterX = json.getJSONObject("misterX");
+          if (misterX.has("lastShownPos")) {
+                if (!(misterX.get("lastShownPos") instanceof Integer)) {
+                    errorLoadNum = 16;
+                }
+            }
+           if (misterX.has("currPos")) {
+                if (!(misterX.get("currPos") instanceof Integer)) {
+                    errorLoadNum = 16;
+                }
+            }
+            if (misterX.get("currPos") < 0 || misterX.get("currPos") > 200) {
+                errorLoadNum = 16;
+            } else {
+            }
+     return errorLoadNum;
+    }
+
+}

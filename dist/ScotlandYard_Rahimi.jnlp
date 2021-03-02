@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="ScotlandYard_Rahimi.jnlp">
+  <information>
+    <title>ScotlandYard_Rahimi</title>
+    <vendor>Reyhan</vendor>
+    <description>null</description>
+    <offline-allowed/>
+  </information>
+  <resources>
+    <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+    <jar href="ScotlandYard_Rahimi.jar" size="2547629" download="eager" />
+    <jar href="lib\gson-2.8.0-javadoc.jar" size="261988" download="eager" />
+    <jar href="lib\gson-2.8.0-sources.jar" size="146908" download="eager" />
+    <jar href="lib\gson-2.8.0.jar" size="231952" download="eager" />
+    <jar href="lib\gson-2.8.6-javadoc.jar" size="655508" download="eager" />
+    <jar href="lib\gson-2.8.6-sources.jar" size="155546" download="eager" />
+    <jar href="lib\gson-2.8.6.jar" size="240255" download="eager" />
+    <jar href="lib\jackson-core-2.2.3.jar" size="192699" download="eager" />
+    <jar href="lib\java-json.jar" size="84697" download="eager" />
+  </resources>
+  <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="ScotlandYard_Rahimi" >
+    <param name="requiredFXVersion" value="8.0+"/>
+  </applet-desc>
+  <jfx:javafx-desc  width="800" height="600" main-class="gui.ScotlandYard_Rahimi"  name="ScotlandYard_Rahimi" />
+  <update check="always"/>
+</jnlp>

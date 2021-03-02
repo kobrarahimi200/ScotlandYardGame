@@ -1,0 +1,25 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package logic;
+
+/**
+ *
+ * @author Reyhan
+ */
+public interface GUIConnector {
+   /// public void displaySymbol(Position coord, int idPlayer, int quadX, int quadY);
+    public void clear();
+    public void showCurrentPlayer(int player);
+
+    public void showInDropDownList(Game game, boolean[] listOfTicket, Position pos);
+
+    public void displaySymbol(Position currPosition, int idxCurrPlayer ,boolean is);
+    
+    public void updateLabelTicketsNum(int[] numOfTickets);
+     public void gameWon(String winnerName, int idPlayer);
+     public void showMisterXTicket(String ticket);
+  
+}
